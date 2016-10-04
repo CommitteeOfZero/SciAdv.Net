@@ -1,0 +1,15 @@
+﻿{
+  "dependencies": {
+    "System.Collections.Immutable": "1.2.0",
+    "Caliburn.Micro": "3.0.0",
+    "PropertyChanged.Fody": "1.51.0",
+    "MahApps.Metro": "1.2.4",
+    "AvalonEdit": "5.0.2"
+  },
+  "frameworks": {
+    "net461": { }
+  },
+  "runtimes": {
+    "win": { }
+  }
+}

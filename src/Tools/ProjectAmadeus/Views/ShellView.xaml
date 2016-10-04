@@ -1,0 +1,79 @@
+﻿<metro:MetroWindow x:Class="ProjectAmadeus.Views.ShellView"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:cm="http://www.caliburnproject.org"
+                   xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                   xmlns:vm="clr-namespace:ProjectAmadeus.ViewModels"
+                   mc:Ignorable="d"
+                   d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=True}"
+                   Height="700" Width="800" WindowStartupLocation="CenterScreen" SaveWindowPosition="True"
+                   BorderThickness="1.5" BorderBrush="{StaticResource AccentColorBrush}"
+                   AllowDrop="True" cm:Message.Attach="[Event Drop] = [HandleFileDrop($droppedfiles)]">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Styles.xaml" />
+                <ResourceDictionary Source="/AmadeusStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource LightBackground}">
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" IsMainMenu="True" FontSize="16">
+                <MenuItem Header="File">
+                    <MenuItem x:Name="OpenFile" Header="Open File..." />
+                    <MenuItem Header="Save As..." />
+                    <MenuItem x:Name="CloseFile" Header="Close File" />
+                    <Separator />
+                    <MenuItem x:Name="Exit" Header="Exit" />
+                </MenuItem>
+
+                <MenuItem Header="View">
+
+                </MenuItem>
+
+                <MenuItem Header="?" />
+            </Menu>
+
+            <Grid>
+                <ContentControl>
+                    <TextBlock FontSize="22" TextAlignment="Center" Foreground="{StaticResource Foreground}"
+                               VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Button cm:Message.Attach="OpenFile" Style="{StaticResource HyperlinkButton}">
+                            <Hyperlink>Open File</Hyperlink>
+                        </Button>
+                        <LineBreak />
+                        or simply drop it here
+                    </TextBlock>
+
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Items.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+
+                <TabControl x:Name="Items" Margin="5,5,0,0">
+                    <TabControl.Style>
+                        <Style TargetType="TabControl" BasedOn="{StaticResource VSTabControlStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Items.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TabControl.Style>
+                </TabControl>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</metro:MetroWindow>

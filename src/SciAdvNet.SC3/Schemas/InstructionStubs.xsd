@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://schemas.sciadv.net/sc3/instructionstubs"
+           xmlns="http://schemas.sciadv.net/sc3/instructionstubs"
+           elementFormDefault="qualified">
+  <xs:element name="InstructionStubs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="InstructionStub" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute name="Name" type="xs:string" use="required" />
+                <xs:attribute name="Opcode" type="xs:hexBinary" use="required" />
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

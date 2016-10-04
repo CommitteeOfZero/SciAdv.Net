@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy RemoteSigned -noexit -file build.ps1

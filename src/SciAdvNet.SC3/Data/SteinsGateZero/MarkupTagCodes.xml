@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<MarkupTags xmlns="http://schemas.sciadv.net/sc3/markuptagcodes"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://schemas.sciadv.net/sc3/markuptagcodes ../../Schemas/MarkupTagCodes.xsd">
+  <MarkupTagInfo Code="01" Name="CharacterName" />
+  <MarkupTagInfo Code="02" Name="DialogueLine" />
+  <MarkupTagInfo Code="09" Name="RubyBase" />
+  <MarkupTagInfo Code="0A" Name="RubyTextStart" />
+  <MarkupTagInfo Code="0B" Name="RubyTextEnd" />
+  <MarkupTagInfo Code="03FF" Name="End" />
+  <!--<MarkupTagInfo Code="04280AA02D1400" Name="TipColorStart" />
+  <MarkupTagInfo Code="04280AA02E1400" Name="TipColorStart" />-->
+  <MarkupTagInfo Code="04800000" Name="TipColorEnd"/>
+</MarkupTags>

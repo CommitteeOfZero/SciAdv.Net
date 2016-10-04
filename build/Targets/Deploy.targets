@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="$(MSBuildTasksPath)\MSBuild.Community.Tasks.dll" TaskName="Zip" />
+
+  <Target Name="Deploy" Condition=" '$(Configuration)' == 'Release' ">
+    <Message Text="------ Deploy started ------" Importance="high" />
+    <Message Text=" _                                          " Importance="high" />
+    <Message Text="//\                                         " Importance="high" />
+    <Message Text="V  \                                        " Importance="high" />
+    <Message Text=" \  \_                                      " Importance="high" />
+    <Message Text="  \,'.`-.                                   " Importance="high" />
+    <Message Text="   |\ `. `.                                 " Importance="high" />
+    <Message Text="   ( \  `. `-.                        _,.-:\" Importance="high" />
+    <Message Text="    \ \   `.  `-._             __..--' ,-';/" Importance="high" />
+    <Message Text="     \ `.   `-.   `-..___..---'   _.--' ,'/ " Importance="high" />
+    <Message Text="      `. `.    `-._        __..--'    ,' /  " Importance="high" />
+    <Message Text="        `. `-_     ``--..''       _.-' ,'   " Importance="high" />
+    <Message Text="          `-_ `-.___        __,--'   ,'     " Importance="high" />
+    <Message Text="             `-.__  `----'''    __.-'       " Importance="high" />
+    <Message Text="                  `--..____..--'            " Importance="high" />
+
+    <CallTarget Targets="PackageBinaries" />
+    <Message Text="------ Deploy succeeded ------" Importance="high" />
+  </Target>
+
+
+  <Target Name="PackageBinaries" DependsOnTargets="GetVersionNumber">
+    <ItemGroup>
+      <All Include="$(OutputRoot)\**" Exclude="$(OutputRoot)\Internal\**" />
+      <ProjectAmadeus Include="$(OutputRoot)\Tools\ProjectAmadeus\**" />
+    </ItemGroup>
+
+    <Message Text="Creating a zip package..." Importance="high" />
+    <Zip ZipFileName="$(ReleasesDir)\$(ZipPackageName)-$(ShortVersionString).zip" WorkingDirectory="$(OutputRoot)" Files="@(All)" />
+    <Zip ZipFileName="$(ReleasesDir)\ProjectAmadeus-$(ShortVersionString).zip" WorkingDirectory="$(OutputRoot)\Tools\ProjectAmadeus\" Files="@(ProjectAmadeus)" />
+  </Target>
+  
+</Project>

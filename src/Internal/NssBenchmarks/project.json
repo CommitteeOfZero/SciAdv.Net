@@ -1,0 +1,11 @@
+﻿{
+  "dependencies": {
+    "BenchmarkDotNet": "0.9.9"
+  },
+  "frameworks": {
+    "net461": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

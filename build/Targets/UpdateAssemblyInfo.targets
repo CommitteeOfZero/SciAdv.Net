@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="$(MSBuildTasksPath)MSBuild.Community.Tasks.dll" TaskName="AssemblyInfo" />
+  <UsingTask AssemblyFile="$(MSBuildTasksPath)MSBuild.Community.Tasks.dll" TaskName="Math.Modulo" />
+  <UsingTask AssemblyFile="$(MSBuildTasksPath)MSBuild.Community.Tasks.dll" TaskName="Time" />
+
+  <Target Name="GetVersionNumber">
+    <PropertyGroup>
+      <Major>0</Major>
+      <Minor>4</Minor>
+      <Revision>0</Revision>
+    </PropertyGroup>
+
+    <Time Format="MMdd">
+      <Output TaskParameter="FormattedTime" PropertyName="MonthAndDay" />
+      <Output TaskParameter="Year" PropertyName="Year" />
+    </Time>
+
+    <Math.Modulo Numbers="$(Year);10">
+      <Output TaskParameter="Result" PropertyName="YearLastDigit" />
+    </Math.Modulo>
+
+    <PropertyGroup>
+      <BuildNumber>$(YearLastDigit)$(MonthAndDay)</BuildNumber>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <VersionString>$(Major).$(Minor).$(BuildNumber).$(Revision)</VersionString>
+      <ShortVersionString>$(Major).$(Minor).$(BuildNumber)</ShortVersionString>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="UpdateAssemblyInfo" AfterTargets="BeforeBuild" DependsOnTargets="GetVersionNumber">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="Properties\AssemblyInfo.cs"
+                  AssemblyCompany="SomeAnon" AssemblyVersion="$(VersionString)" AssemblyCopyright="Copyright © SomeAnon 2016"
+                  AssemblyTitle="$(AssemblyTitle)" AssemblyDescription="$(AssemblyDescription)"
+                  ComVisible="false" CLSCompliant="false"/>
+  </Target>
+</Project>

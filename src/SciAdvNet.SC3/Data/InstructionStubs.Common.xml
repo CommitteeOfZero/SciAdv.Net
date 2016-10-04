@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<InstructionStubs xmlns="http://schemas.sciadv.net/sc3/instructionstubs"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://schemas.sciadv.net/sc3/instructionstubs ../Schemas/InstructionStubs.xsd">
+  <InstructionStub Opcode="FE" Name="Assign">
+    expr assignmentStatement
+  </InstructionStub>
+
+  <InstructionStub Opcode="0000" Name="EndOfScript" />
+  <InstructionStub Opcode="0001" Name="CreateThread">
+    expr threadId, expr slot, ushort codeBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0002" Name="TerminateThread">
+    expr threadId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0003" Name="ExitThread" />
+  <InstructionStub Opcode="0004" Name="LoadScript">
+    expr slot, expr scriptId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0006" Name="Halt" />
+  <InstructionStub Opcode="0007" Name="Jump">
+    ushort targetBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="000D" Name="CallFar">
+    expr slot, ushort targetBlockId, ushort returnAddressId
+  </InstructionStub>
+
+  <InstructionStub Opcode="000E" Name="Return" />
+
+  <InstructionStub Opcode="0010" Name="JumpOnFlag">
+    byte expectedValue, expr flagId, expr targetBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0011" Name="WaitForFlag">
+    byte value, expr flagId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0012" Name="SetFlag">
+    expr flagId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0013" Name="ResetFlag">
+    expr flagId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0021" Name="PlayBgm">
+    byte loop, expr bgmId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0022" Name="StopBgm">
+    byte unk
+  </InstructionStub>
+
+  <InstructionStub Opcode="0023" Name="PlaySfx">
+    ushort unk1, expr unk2, expr unk3
+  </InstructionStub>
+
+  <InstructionStub Opcode="0024" Name="StopSfx">
+    byte channelId
+  </InstructionStub>
+
+  <InstructionStub Opcode="002E" Name="DisplayChapterName">
+    expr unk
+  </InstructionStub>
+
+  <InstructionStub Opcode="0033" Name="Wait">
+    expr delay, expr unkExpr
+  </InstructionStub>
+
+  <InstructionStub Opcode="0100" Name="CreateSurface">
+    byte unkByte, expr surfaceId, expr width, expr height
+  </InstructionStub>
+
+  <InstructionStub Opcode="0102" Name="LoadTexture">
+    expr surfaceId, expr unkExpr, expr textureId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0109" Name="Checkpoint">
+    byte null, ushort checkpointId
+  </InstructionStub>
+
+  <InstructionStub Opcode="010B" Name="ClearDialogueWindow" />
+
+  <InstructionStub Opcode="010C00" Name="LoadDialogueLine">
+    expr characterId, ushort lineId
+  </InstructionStub>
+
+  <InstructionStub Opcode="010C03" Name="LoadVoiceActedDialogueLine">
+    expr audioId, expr animationId, expr lineId, ushort unk
+  </InstructionStub>
+
+  <InstructionStub Opcode="010D00" Name="DisplayDialogueLine" />
+
+  <InstructionStub Opcode="010E" Name="InstantiateTextStyle">
+    expr instanceId, ushort styleDataBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="010F" Name="SetNGmoji">
+    expr unkStringId
+  </InstructionStub>
+
+  <InstructionStub Opcode="011101" Name="ShowDialogueWindow" />
+  <InstructionStub Opcode="011102" Name="AwaitShowDialogueWindow" />
+  <InstructionStub Opcode="011103" Name="AwaitHideDialogueWindow"/>
+  <InstructionStub Opcode="011105" Name="HideDialogueWindow">
+    expr unk
+  </InstructionStub>
+
+  <InstructionStub Opcode="0121" Name="InstantiateStringArray">
+    expr instanceId, ushort dataBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="1000" Name="InitSubsystem" />
+  <InstructionStub Opcode="1001" Name="LoadBackground">
+    expr unk1, expr backgroundId
+  </InstructionStub>
+
+  <InstructionStub Opcode="100500" Name="LoadCharacter">
+    expr buf, expr unk1, ushort unk2
+  </InstructionStub>
+
+  <InstructionStub Opcode="102200" Name="QuickSave" />
+  <InstructionStub Opcode="10220A" Name="SaveState">
+    ushort checkpointId
+  </InstructionStub>
+  <InstructionStub Opcode="102205" Name="State_UNK05" />
+
+  <InstructionStub Opcode="1022FF" Name="State_UNKFF" />
+
+  <InstructionStub Opcode="1029" Name="SetEVFlag">
+    expr unkExpr
+  </InstructionStub>
+</InstructionStubs>
