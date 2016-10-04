@@ -14,6 +14,11 @@ namespace SC3Enc
                 return null;
             }
 
+            if (tag.Name == "comment")
+            {
+                return null;
+            }
+
             return base.DeserializeTag(tag);
         }
 
