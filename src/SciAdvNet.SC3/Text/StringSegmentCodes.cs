@@ -1,6 +1,6 @@
 ﻿namespace SciAdvNet.SC3.Text
 {
-    internal static class SC3StringMarker
+    internal static class StringSegmentCodes
     {
         public const byte LineBreak = 0x00;
         public const byte CharacterName = 0x01;

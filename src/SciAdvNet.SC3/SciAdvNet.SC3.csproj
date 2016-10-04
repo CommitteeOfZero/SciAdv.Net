@@ -51,7 +51,7 @@
     <Compile Include="Text\DefaultSC3StringSerializer.cs" />
     <Compile Include="Text\DefaultSC3StringDeserializer.cs" />
     <Compile Include="Exceptions.cs" />
-    <Compile Include="Text\SC3StringMarker.cs" />
+    <Compile Include="Text\StringSegmentCodes.cs" />
     <Compile Include="Text\SC3String.cs" />
     <Compile Include="Text\SC3StringDecoder.cs" />
     <Compile Include="Text\SC3StringEncoder.cs" />

@@ -45,7 +45,7 @@ namespace SciAdvNet.SC3.Text
         private string Charset => _data.CharacterSet;
         private ImmutableDictionary<int, string> PrivateUseCharacters => _data.PrivateUseCharacters;
         
-        private static bool IsCharacter(byte b) => b >= 0x80 || b == SC3StringMarker.LineBreak;
+        private static bool IsCharacter(byte b) => b >= 0x80 || b == StringSegmentCodes.LineBreak;
 
         public SC3String DecodeString(byte[] bytes)
         {
@@ -55,7 +55,7 @@ namespace SciAdvNet.SC3.Text
                 var scanner = new Scanner(reader);
                 var segments = ImmutableArray.CreateBuilder<SC3StringSegment>();
                 byte peek;
-                while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != SC3StringMarker.StringTerminator)
+                while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != StringSegmentCodes.StringTerminator)
                 {
                     var seg = NextSegment(scanner);
                     segments.Add(seg);
@@ -63,7 +63,7 @@ namespace SciAdvNet.SC3.Text
 
                 if (!scanner.ReachedEnd)
                 {
-                    scanner.EatMarker(SC3StringMarker.StringTerminator);
+                    scanner.EatMarker(StringSegmentCodes.StringTerminator);
                 }
 
                 return new SC3String(segments.ToImmutable());
@@ -75,60 +75,60 @@ namespace SciAdvNet.SC3.Text
             byte peek = scanner.PeekByte();
             switch (peek)
             {
-                case SC3StringMarker.CharacterName:
+                case StringSegmentCodes.CharacterName:
                     scanner.Advance();
                     return new Marker(MarkerKind.CharacterName);
 
-                case SC3StringMarker.DialogueLine:
+                case StringSegmentCodes.DialogueLine:
                     scanner.Advance();
                     return new Marker(MarkerKind.DialogueLine);
 
-                case SC3StringMarker.RubyBase:
+                case StringSegmentCodes.RubyBase:
                     scanner.Advance();
                     return new Marker(MarkerKind.RubyBase);
 
-                case SC3StringMarker.RubyTextStart:
+                case StringSegmentCodes.RubyTextStart:
                     scanner.Advance();
                     return new Marker(MarkerKind.RubyTextStart);
 
-                case SC3StringMarker.RubyTextEnd:
+                case StringSegmentCodes.RubyTextEnd:
                     scanner.Advance();
                     return new Marker(MarkerKind.RubyTextEnd);
 
-                case SC3StringMarker.SetColor:
+                case StringSegmentCodes.SetColor:
                     scanner.Advance();
                     var colorIndex = SC3ExpressionParser.ParseExpression(scanner.Reader);
                     return new SetColorCommand(colorIndex);
 
-                case SC3StringMarker.SetFontSize:
+                case StringSegmentCodes.SetFontSize:
                     scanner.Advance();
                     int fontSize = scanner.Reader.ReadInt16();
                     return new SetFontSizeCommand(fontSize);
 
-                case SC3StringMarker.SetAlignment_Center:
+                case StringSegmentCodes.SetAlignment_Center:
                     scanner.Advance();
                     return new CenterTextCommand();
 
-                case SC3StringMarker.SetTopMargin:
+                case StringSegmentCodes.SetTopMargin:
                     scanner.Advance();
                     int topMargin = scanner.Reader.ReadInt16();
                     return new SetMarginCommand(null, topMargin);
 
-                case SC3StringMarker.SetLeftMargin:
+                case StringSegmentCodes.SetLeftMargin:
                     scanner.Advance();
                     int leftMargin = scanner.Reader.ReadInt16();
                     return new SetMarginCommand(leftMargin, null);
 
-                case SC3StringMarker.EvaluateExpression:
+                case StringSegmentCodes.EvaluateExpression:
                     scanner.Advance();
                     var expression = SC3ExpressionParser.ParseExpression(scanner.Reader);
                     return new EvaluateExpressionCommand(expression);
 
-                case SC3StringMarker.Present:
+                case StringSegmentCodes.Present:
                     scanner.Advance();
                     return new PresentCommand(resetTextAlignment: false);
 
-                case SC3StringMarker.Present_ResetAlignment:
+                case StringSegmentCodes.Present_ResetAlignment:
                     scanner.Advance();
                     return new PresentCommand(resetTextAlignment: true);
 
@@ -150,13 +150,13 @@ namespace SciAdvNet.SC3.Text
         {
             var sb = new StringBuilder();
             byte peek;
-            while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != SC3StringMarker.StringTerminator)
+            while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != StringSegmentCodes.StringTerminator)
             {
                 if (peek >= 0x80)
                 {
                     NextCharacter(scanner, sb);
                 }
-                else if (peek == SC3StringMarker.LineBreak)
+                else if (peek == StringSegmentCodes.LineBreak)
                 {
                     scanner.Advance();
                     sb.Append("\n");

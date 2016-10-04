@@ -27,11 +27,11 @@ namespace SciAdvNet.SC3.Text
         {
             private static readonly Dictionary<MarkerKind, byte> s_markers = new Dictionary<MarkerKind, byte>()
             {
-                [MarkerKind.CharacterName] = SC3StringMarker.CharacterName,
-                [MarkerKind.DialogueLine] = SC3StringMarker.DialogueLine,
-                [MarkerKind.RubyBase] = SC3StringMarker.RubyBase,
-                [MarkerKind.RubyTextStart] = SC3StringMarker.RubyTextStart,
-                [MarkerKind.RubyTextEnd] = SC3StringMarker.RubyTextEnd
+                [MarkerKind.CharacterName] = StringSegmentCodes.CharacterName,
+                [MarkerKind.DialogueLine] = StringSegmentCodes.DialogueLine,
+                [MarkerKind.RubyBase] = StringSegmentCodes.RubyBase,
+                [MarkerKind.RubyTextStart] = StringSegmentCodes.RubyTextStart,
+                [MarkerKind.RubyTextEnd] = StringSegmentCodes.RubyTextEnd
             };
 
             private ImmutableArray<byte>.Builder _builder;
@@ -52,7 +52,7 @@ namespace SciAdvNet.SC3.Text
                     Visit(segment);
                 }
 
-                Append(SC3StringMarker.StringTerminator);
+                Append(StringSegmentCodes.StringTerminator);
                 return _builder.ToImmutable();
             }
 
@@ -81,38 +81,38 @@ namespace SciAdvNet.SC3.Text
 
             public override void VisitPresentCommand(PresentCommand presentCommand)
             {
-                byte b = presentCommand.ResetTextAlignment ? SC3StringMarker.Present_ResetAlignment : SC3StringMarker.Present;
+                byte b = presentCommand.ResetTextAlignment ? StringSegmentCodes.Present_ResetAlignment : StringSegmentCodes.Present;
                 Append(b);
             }
 
             public override void VisitSetColorCommand(SetColorCommand setColorCommand)
             {
-                Append(SC3StringMarker.SetColor);
+                Append(StringSegmentCodes.SetColor);
                 Append(setColorCommand.ColorIndex.Bytes);
             }
 
             public override void VisitCenterTextCommand(CenterTextCommand centerTextCommand)
             {
-                Append(SC3StringMarker.SetAlignment_Center);
+                Append(StringSegmentCodes.SetAlignment_Center);
             }
 
             public override void VisitSetMarginCommand(SetMarginCommand setMarginCommand)
             {
                 if (setMarginCommand.LeftMargin.HasValue)
                 {
-                    Append(SC3StringMarker.SetLeftMargin);
+                    Append(StringSegmentCodes.SetLeftMargin);
                     Append(BitConverter.GetBytes(setMarginCommand.LeftMargin.Value));
                 }
                 else
                 {
-                    Append(SC3StringMarker.SetTopMargin);
+                    Append(StringSegmentCodes.SetTopMargin);
                     Append(BitConverter.GetBytes(setMarginCommand.TopMargin.Value));
                 }
             }
 
             public override void VisitSetFontSizeCommand(SetFontSizeCommand setFontSizeCommand)
             {
-                Append(SC3StringMarker.SetFontSize);
+                Append(StringSegmentCodes.SetFontSize);
                 Append(BitConverter.GetBytes(setFontSizeCommand.FontSize));
             }
 

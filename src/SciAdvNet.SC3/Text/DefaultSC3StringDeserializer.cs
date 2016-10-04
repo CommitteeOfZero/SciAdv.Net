@@ -65,7 +65,10 @@ namespace SciAdvNet.SC3.Text
             while (!scanner.ReachedEnd)
             {
                 var seg = NextSegment(scanner);
-                segments.Add(seg);
+                if (seg != null)
+                {
+                    segments.Add(seg);
+                }
             }
 
             return new SC3String(segments.ToImmutable());
@@ -98,7 +101,7 @@ namespace SciAdvNet.SC3.Text
             return new TextSegment(value);
         }
 
-        private SC3StringSegment DeserializeTag(Tag tag)
+        public virtual SC3StringSegment DeserializeTag(ParsedTag tag)
         {
             switch (tag.Name)
             {
@@ -121,7 +124,7 @@ namespace SciAdvNet.SC3.Text
             }
         }
 
-        private Marker DeserializeMarker(Tag tag)
+        private Marker DeserializeMarker(ParsedTag tag)
         {
             switch (tag.Name.ToLowerInvariant())
             {
@@ -141,14 +144,14 @@ namespace SciAdvNet.SC3.Text
             }
         }
 
-        private SetColorCommand DeserializeColorTag(Tag tag)
+        private SetColorCommand DeserializeColorTag(ParsedTag tag)
         {
             string index = tag.GetAttribute("index");
             var bytes = BinaryUtils.HexStrToBytes(index);
             return new SetColorCommand(SC3ExpressionParser.ParseExpression(bytes));
         }
 
-        private SetMarginCommand DeserializeMarginTag(Tag tag)
+        private SetMarginCommand DeserializeMarginTag(ParsedTag tag)
         {
             if (!tag.Attributes.Any())
             {
@@ -169,14 +172,14 @@ namespace SciAdvNet.SC3.Text
             }
         }
 
-        private SetFontSizeCommand DeserializeFontSizeTag(Tag tag)
+        private SetFontSizeCommand DeserializeFontSizeTag(ParsedTag tag)
         {
             string strSize = tag.GetAttribute("size");
             int size = int.Parse(strSize);
             return new SetFontSizeCommand(size);
         }
 
-        private Tag ParseTag(Scanner scanner)
+        private ParsedTag ParseTag(Scanner scanner)
         {
             scanner.EatChar('[');
 
@@ -191,7 +194,7 @@ namespace SciAdvNet.SC3.Text
             if (scanner.PeekChar() == ']')
             {
                 scanner.Advance();
-                return new Tag(tagName);
+                return new ParsedTag(tagName);
             }
 
             var attributes = ImmutableDictionary.CreateBuilder<string, string>();
@@ -209,7 +212,7 @@ namespace SciAdvNet.SC3.Text
             }
 
             scanner.EatChar(']');
-            return new Tag(tagName, attributes.ToImmutable());
+            return new ParsedTag(tagName, attributes.ToImmutable());
         }
 
         private KeyValuePair<string, string> ParseAttribute(Scanner scanner)
@@ -236,15 +239,15 @@ namespace SciAdvNet.SC3.Text
             return new KeyValuePair<string, string>(attributeName.ToLowerInvariant(), value);
         }
 
-        private sealed class Tag
+        public sealed class ParsedTag
         {
-            public Tag(string name, ImmutableDictionary<string, string> attributes)
+            public ParsedTag(string name, ImmutableDictionary<string, string> attributes)
             {
                 Name = name;
                 Attributes = attributes;
             }
 
-            public Tag(string name)
+            public ParsedTag(string name)
                 : this(name, ImmutableDictionary<string, string>.Empty)
             {
             }

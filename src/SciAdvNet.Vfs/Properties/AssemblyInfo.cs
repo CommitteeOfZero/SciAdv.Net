@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 [assembly: System.Reflection.AssemblyCompany("SomeAnon")]
-[assembly: System.Reflection.AssemblyVersion("0.4.61003.0")]
+[assembly: System.Reflection.AssemblyVersion("0.4.61004.0")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright © SomeAnon 2016")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: System.CLSCompliant(false)]
