@@ -2,6 +2,7 @@
 {
     public interface IFilePicker
     {
-        string PickFile(string extensions, string description);
+        string PickOpen(string extensions, string description);
+        string PickSave(string extensions, string description);
     }
 }

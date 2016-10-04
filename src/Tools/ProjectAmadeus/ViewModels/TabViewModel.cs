@@ -9,13 +9,12 @@ namespace ProjectAmadeus.ViewModels
 {
     public sealed class TabViewModel : Screen, ITab
     {
-        private SC3Module _module;
-
         public TabViewModel()
         {
         }
 
         public string FilePath { get; set; }
+        public SC3Module Module { get; private set; }
         public IList<GameStringViewModel> Strings { get; private set; }
 
         protected override void OnInitialize()
@@ -40,15 +39,15 @@ namespace ProjectAmadeus.ViewModels
                 updatedText = row.DialogueLine;
             }
 
-            _module.UpdateString(row.Id, SC3String.Deserialize(updatedText));
+            Module.UpdateString(row.Id, SC3String.Deserialize(updatedText));
         }
 
         private void DecodeStrings()
         {
             var strings = new List<GameStringViewModel>();
 
-            _module = SC3Module.Load(FilePath);
-            foreach (var handle in _module.StringTable)
+            Module = SC3Module.Load(FilePath);
+            foreach (var handle in Module.StringTable)
             {
                 var sc3String = handle.Resolve();
 
@@ -65,7 +64,7 @@ namespace ProjectAmadeus.ViewModels
         {
             if (close)
             {
-                _module.Dispose();
+                Module.Dispose();
             }
         }
     }

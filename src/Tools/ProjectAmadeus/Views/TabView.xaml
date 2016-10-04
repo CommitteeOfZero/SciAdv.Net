@@ -36,7 +36,7 @@
 
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <ContentControl cm:View.Model="{Binding}" />
+                            <TextBox Text="{Binding DialogueLine, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" />
                             <!--<StackPanel>
                                 <TextBox Text="{Binding DialogueLine, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" />
                             </StackPanel>-->

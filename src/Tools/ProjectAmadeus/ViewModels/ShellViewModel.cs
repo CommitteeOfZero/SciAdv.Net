@@ -2,6 +2,8 @@
 using ProjectAmadeus.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Windows;
 
 namespace ProjectAmadeus.ViewModels
@@ -30,7 +32,7 @@ namespace ProjectAmadeus.ViewModels
 
         public void OpenFile()
         {
-            string path = _filePicker.PickFile(ScriptExtensions, FileTypeDescription);
+            string path = _filePicker.PickOpen(ScriptExtensions, FileTypeDescription);
             if (!string.IsNullOrEmpty(path))
             {
                 var tab = CreateTab(path);
@@ -48,6 +50,27 @@ namespace ProjectAmadeus.ViewModels
                 {
                     ActivateItem(tab);
                 }
+            }
+        }
+
+        public void SaveAs()
+        {
+            string path = _filePicker.PickSave("*.txt", "Text files");
+            if (!string.IsNullOrEmpty(path))
+            {
+                var sb = new StringBuilder();
+
+                var active = ActiveItem;
+                active.Module.ApplyPendingUpdates();
+
+                foreach (var stringHandle in active.Module.StringTable)
+                {
+                    sb.Append($"[{stringHandle.Id}]");
+                    sb.Append(stringHandle.Resolve().ToString(normalize: true));
+                    sb.AppendLine();
+                }
+
+                File.WriteAllText(path, sb.ToString());
             }
         }
 
