@@ -35,21 +35,37 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NssInteractive", "src\Inter
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NssBenchmarks", "src\Internal\NssBenchmarks\NssBenchmarks.csproj", "{ACB5C0B4-8DCE-47C1-9464-976875546679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.MagesVfs.Tests", "src\SciAdvNet.MagesVfs.Tests\SciAdvNet.MagesVfs.Tests.csproj", "{2B9AAEC0-73B2-4A66-8CD4-652701C6ED22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.MagesVfs.Tests", "tests\SciAdvNet.MagesVfs.Tests\SciAdvNet.MagesVfs.Tests.csproj", "{2B9AAEC0-73B2-4A66-8CD4-652701C6ED22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.NSScript.Tests", "src\SciAdvNet.NSScript.Tests\SciAdvNet.NSScript.Tests.csproj", "{EC39394D-3A99-4EBB-83F3-9D800A8D4BCC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.NSScript.Tests", "tests\SciAdvNet.NSScript.Tests\SciAdvNet.NSScript.Tests.csproj", "{EC39394D-3A99-4EBB-83F3-9D800A8D4BCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.SC3.Tests", "src\SciAdvNet.SC3.Tests\SciAdvNet.SC3.Tests.csproj", "{F46C8D26-8858-47CC-AEC3-D9AD181F22AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SciAdvNet.SC3.Tests", "tests\SciAdvNet.SC3.Tests\SciAdvNet.SC3.Tests.csproj", "{F46C8D26-8858-47CC-AEC3-D9AD181F22AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC3Enc", "src\Internal\SC3Enc\SC3Enc.csproj", "{64248C4A-F8FE-468B-8019-5B0D1D90254B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{33D617FD-895B-4247-8FE5-C0FC78FEAB20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{54E01EC0-228B-4CA4-A3C2-3CAFF1B5E9B1}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{09cc8b05-e45d-4b40-a44b-eff68238f95f}*SharedItemsImports = 4
 		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{19a288b6-7e05-488d-92d4-ea91629bf25c}*SharedItemsImports = 13
 		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{1b768a39-f2bd-41f5-8cbe-3c6f1b9f69dc}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{2b9aaec0-73b2-4a66-8cd4-652701c6ed22}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{57c40f3d-568e-4055-b1b2-534740324d32}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{5b0e0750-7271-48ef-8dc3-db4fa50da197}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{64248c4a-f8fe-468b-8019-5b0d1d90254b}*SharedItemsImports = 4
 		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{679a414c-cb14-4a17-b90b-f9fc16db55e6}*SharedItemsImports = 4
 		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{8115741a-a820-4943-bea2-e57edbf3689b}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{82597a86-a912-417f-9875-3d52b53dd343}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{985ef24f-2be8-4cda-92e9-01a401ab864a}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{9a399352-004c-4275-9d32-90bf8c19f0aa}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{acb5c0b4-8dce-47c1-9464-976875546679}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{d141e5dc-81db-4352-8bae-e3772bdc23de}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{e2f87d43-2be1-4916-b0bd-189e9df344e8}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{ec39394d-3a99-4ebb-83f3-9d800a8d4bcc}*SharedItemsImports = 4
+		src\SciAdvNet.Common\SciAdvNet.Common.projitems*{f46c8d26-8858-47cc-aec3-d9ad181f22ae}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,12 +345,25 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{F5DCBFA2-B438-4CD0-A67F-6D329451598C} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
 		{5B0E0750-7271-48EF-8DC3-DB4FA50DA197} = {F5DCBFA2-B438-4CD0-A67F-6D329451598C}
+		{56EB6F12-8D8A-41A3-88F2-FCC99A1FDD44} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
 		{9A399352-004C-4275-9D32-90BF8C19F0AA} = {56EB6F12-8D8A-41A3-88F2-FCC99A1FDD44}
 		{09CC8B05-E45D-4B40-A44B-EFF68238F95F} = {F5DCBFA2-B438-4CD0-A67F-6D329451598C}
+		{4EC678B3-068B-47B9-8241-4D9D8416A3D9} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{1B768A39-F2BD-41F5-8CBE-3C6F1B9F69DC} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{8115741A-A820-4943-BEA2-E57EDBF3689B} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{679A414C-CB14-4A17-B90B-F9FC16DB55E6} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{19A288B6-7E05-488D-92D4-EA91629BF25C} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{D141E5DC-81DB-4352-8BAE-E3772BDC23DE} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
 		{985EF24F-2BE8-4CDA-92E9-01A401AB864A} = {4EC678B3-068B-47B9-8241-4D9D8416A3D9}
+		{E2F87D43-2BE1-4916-B0BD-189E9DF344E8} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
+		{57C40F3D-568E-4055-B1B2-534740324D32} = {33D617FD-895B-4247-8FE5-C0FC78FEAB20}
 		{82597A86-A912-417F-9875-3D52B53DD343} = {56EB6F12-8D8A-41A3-88F2-FCC99A1FDD44}
 		{ACB5C0B4-8DCE-47C1-9464-976875546679} = {56EB6F12-8D8A-41A3-88F2-FCC99A1FDD44}
+		{2B9AAEC0-73B2-4A66-8CD4-652701C6ED22} = {54E01EC0-228B-4CA4-A3C2-3CAFF1B5E9B1}
+		{EC39394D-3A99-4EBB-83F3-9D800A8D4BCC} = {54E01EC0-228B-4CA4-A3C2-3CAFF1B5E9B1}
+		{F46C8D26-8858-47CC-AEC3-D9AD181F22AE} = {54E01EC0-228B-4CA4-A3C2-3CAFF1B5E9B1}
 		{64248C4A-F8FE-468B-8019-5B0D1D90254B} = {56EB6F12-8D8A-41A3-88F2-FCC99A1FDD44}
 	EndGlobalSection
 EndGlobal

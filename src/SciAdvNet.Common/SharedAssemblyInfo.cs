@@ -1,0 +1,5 @@
+﻿[assembly: System.Reflection.AssemblyCompany("SomeAnon42")]
+[assembly: System.Reflection.AssemblyVersion("0.5.*")]
+[assembly: System.Reflection.AssemblyCopyright("Copyright © SomeAnon 2016")]
+[assembly: System.Runtime.InteropServices.ComVisible(false)]
+[assembly: System.CLSCompliant(false)]

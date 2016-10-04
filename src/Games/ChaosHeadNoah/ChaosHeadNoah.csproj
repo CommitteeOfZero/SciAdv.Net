@@ -134,6 +134,7 @@
       <HintPath>..\..\..\..\NVorbis\bin\NVorbis.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Import Project="..\..\SciAdvNet.Common\SciAdvNet.Common.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

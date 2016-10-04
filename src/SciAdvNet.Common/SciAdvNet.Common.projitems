@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)BinaryReaderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BinaryWriterExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SharedAssemblyInfo.cs" />
   </ItemGroup>
 </Project>

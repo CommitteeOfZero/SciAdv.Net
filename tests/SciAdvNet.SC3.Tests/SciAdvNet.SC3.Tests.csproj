@@ -3,19 +3,20 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(SolutionDir)\build\Targets\Common.targets" />
   <PropertyGroup>
-    <OutputPath>$(OutputRoot)\UnitTests\NSScript\</OutputPath>
+    <OutputPath>$(OutputRoot)\UnitTests\SC3\</OutputPath>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EC39394D-3A99-4EBB-83F3-9D800A8D4BCC}</ProjectGuid>
+    <ProjectGuid>{F46C8D26-8858-47CC-AEC3-D9AD181F22AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SciAdvNet.NSScript.Tests</RootNamespace>
-    <AssemblyName>SciAdvNet.NSScript.Tests</AssemblyName>
+    <RootNamespace>SciAdvNet.SC3.Tests</RootNamespace>
+    <AssemblyName>SciAdvNet.SC3.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,41 +43,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChaosHeadTests.cs" />
-    <Compile Include="DialogueParsingTests.cs" />
-    <Compile Include="ExpressionEvaluationTests.cs" />
-    <Compile Include="ExpressionParsingTests.cs" />
-    <Compile Include="Helpers.cs" />
-    <Compile Include="LexicalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatementParsingTests.cs" />
-    <Compile Include="TestScripts.cs" />
+    <Compile Include="SteinsGateHDTests.cs" />
+    <Compile Include="StringDecodingTests.cs" />
+    <Compile Include="StringDeserializationTests.cs" />
+    <Compile Include="StringEncodingTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\ChaosHeadScripts.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\HelloWorld.nss">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\XmlSyntax.nss">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="App.config" />
+    <Content Include="Data\SteinsGateHD.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="project.json" />
     <None Include="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SciAdvNet.NSScript\SciAdvNet.NSScript.csproj">
-      <Project>{d141e5dc-81db-4352-8bae-e3772bdc23de}</Project>
-      <Name>SciAdvNet.NSScript</Name>
+    <ProjectReference Include="..\..\src\SciAdvNet.SC3\SciAdvNet.SC3.csproj">
+      <Project>{1B768A39-F2BD-41F5-8CBE-3C6F1B9F69DC}</Project>
+      <Name>SciAdvNet.SC3</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <Import Project="..\..\src\SciAdvNet.Common\SciAdvNet.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
