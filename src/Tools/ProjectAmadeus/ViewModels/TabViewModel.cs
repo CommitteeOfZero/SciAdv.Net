@@ -27,7 +27,7 @@ namespace ProjectAmadeus.ViewModels
             DecodeStrings();
         }
 
-        public void UpdateRow(GameString row)
+        public void UpdateRow(GameStringViewModel row)
         {
             string updatedText;
             if (!string.IsNullOrEmpty(row.CharacterName))
