@@ -1,1 +1,3 @@
-powershell -ExecutionPolicy RemoteSigned -noexit -file build.ps1
+call "SetDevCommandPrompt.cmd"
+nuget restore
+msbuild /p:Configuration=Release /m

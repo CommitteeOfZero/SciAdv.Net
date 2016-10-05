@@ -2,6 +2,7 @@
 
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <SolutionDir>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), SciAdvNet.sln))</SolutionDir>
     <SrcDir>$(SolutionDir)\src\</SrcDir>
     <BinDir>$(SolutionDir)\bin\</BinDir>
     <ReleasesDir>$(SolutionDir)\releases\</ReleasesDir>
