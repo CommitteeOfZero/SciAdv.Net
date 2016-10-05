@@ -1,3 +1,3 @@
 call "SetDevCommandPrompt.cmd"
 nuget restore
-msbuild /p:Configuration=Release /m
+msbuild /p:CIBuild=false /p:Configuration=Release /maxcpucount /m

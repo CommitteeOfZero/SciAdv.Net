@@ -2,29 +2,6 @@
 
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <UsingTask AssemblyFile="$(MSBuildTasksPath)\MSBuild.Community.Tasks.dll" TaskName="Zip" />
-  
-  <UsingTask TaskName="GetVersionParts" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
-    <ParameterGroup>
-      <AssemblyPath ParameterType="System.String" Required="true" />
-      <MajorVersion ParameterType="System.Int32" Output="true" />
-      <MinorVersion ParameterType="System.Int32" Output="true" />
-      <Build ParameterType="System.Int32" Output="true" />
-      <Revision ParameterType="System.Int32" Output="true" />
-    </ParameterGroup>
-    <Task>
-      <Using Namespace="System.Diagnostics" />
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
-        Version v = Version.Parse(FileVersionInfo.GetVersionInfo(AssemblyPath).FileVersion);
-
-        MajorVersion = v.Major;
-        MinorVersion = v.Minor;
-        Build = v.Build;
-        Revision = v.Revision;
-      ]]>
-      </Code>
-    </Task>
-  </UsingTask>
 
   <Target Name="Deploy" Condition=" '$(Configuration)' == 'Release' ">
     <Message Text="------ Deploy started ------" Importance="high" />
@@ -47,40 +24,19 @@
     <Message Text="------ Deploy succeeded ------" Importance="high" />
   </Target>
 
-  <Target Name="GetVersionString">
-    <PropertyGroup>
-      <MajorVersion />
-      <MinorVersion />
-      <Build />
-      <Revision />
-    </PropertyGroup>
-
-    <GetVersionParts AssemblyPath="$(OutputRoot)\Tools\ProjectAmadeus\ProjectAmadeus.exe">
-      <Output TaskParameter="MajorVersion" PropertyName="MajorVersion" />
-      <Output TaskParameter="MinorVersion" PropertyName="MinorVersion" />
-      <Output TaskParameter="Build" PropertyName="Build" />
-      <Output TaskParameter="Revision" PropertyName="Revision" />
-    </GetVersionParts>
-
-    <PropertyGroup>
-      <VersionString>$(MajorVersion).$(MinorVersion).$(Build).$(Revision)</VersionString>
-    </PropertyGroup>
-  </Target>
-
-  <Target Name="PackageBinaries" DependsOnTargets="GetVersionString">
+  <Target Name="PackageBinaries">
     <ItemGroup>
       <All Include="$(OutputRoot)\**" Exclude="$(OutputRoot)\Internal\**;$(OutputRoot)\UnitTests\**;$(OutputRoot)\**\*.pdb;$(OutputRoot)\**\PropertyChanged.dll" />
       <ProjectAmadeus Include="$(OutputRoot)\Tools\ProjectAmadeus\**" Exclude="$(OutputRoot)\**\*.pdb;$(OutputRoot)\**\PropertyChanged.dll" />
       <Internal Include="$(OutputRoot)\Internal\**" />
       <Ungelify Include="$(OutputRoot)\Tools\Ungelify\**" />
-    </ItemGroup>
-    
+    </ItemGroup> 
 
     <Message Text="Creating a zip package..." Importance="high" />
-    <Zip ZipFileName="$(ReleasesDir)\$(ZipPackageName)-$(VersionString).zip" WorkingDirectory="$(OutputRoot)" Files="@(All)" />
-    <Zip ZipFileName="$(ReleasesDir)\ProjectAmadeus-$(VersionString).zip" WorkingDirectory="$(OutputRoot)\Tools\ProjectAmadeus\" Files="@(ProjectAmadeus)" />
-    <Zip ZipFileName="$(ReleasesDir)\Ungelify-$(VersionString).zip" WorkingDirectory="$(OutputRoot)\Tools\Ungelify\" Files="@(Ungelify)" />
-    <Zip ZipFileName="$(ReleasesDir)\Internal-$(VersionString).zip" WorkingDirectory="$(OutputRoot)\Internal\" Files="@(Internal)" />
+    <Zip ZipFileName="$(ReleasesDir)\$(ZipPackageName).zip" WorkingDirectory="$(OutputRoot)" Files="@(All)" />
+    <Zip ZipFileName="$(ReleasesDir)\ProjectAmadeus.zip" WorkingDirectory="$(OutputRoot)\Tools\ProjectAmadeus\" Files="@(ProjectAmadeus)" />
+    <Zip ZipFileName="$(ReleasesDir)\Ungelify.zip" WorkingDirectory="$(OutputRoot)\Tools\Ungelify\" Files="@(Ungelify)" />
+    <Zip ZipFileName="$(ReleasesDir)\Internal.zip" WorkingDirectory="$(OutputRoot)\Internal\" Files="@(Internal)" />
   </Target>
   
 </Project>

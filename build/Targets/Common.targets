@@ -2,13 +2,30 @@
 
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup>
-    <Import Project="Settings.targets" />
     <Import Project="Deploy.targets" />
   </ImportGroup>
 
   <PropertyGroup>
     <OutputPath>$(OutputRoot)</OutputPath>
     <AllowedReferenceRelatedFileExtensions>None</AllowedReferenceRelatedFileExtensions>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SolutionDir>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), SciAdvNet.sln))</SolutionDir>
+    <SrcDir>$(SolutionDir)\src\</SrcDir>
+    <BinDir>$(SolutionDir)\bin\</BinDir>
+    <ReleasesDir>$(SolutionDir)\releases\</ReleasesDir>
+    <BuildDir>$(SolutionDir)\build\</BuildDir>
+    <MSBuildTasksPath>$(BuildDir)\MSBuild Tasks\</MSBuildTasksPath>
+    <OutputRoot>$(BinDir)\$(Configuration)</OutputRoot>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj</BaseIntermediateOutputPath>
+    <ZipPackageName>SciAdv.NET</ZipPackageName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>False</DebugSymbols>
+    <DebugType>None</DebugType>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
   </PropertyGroup>
   
 </Project>
