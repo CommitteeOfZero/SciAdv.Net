@@ -120,41 +120,41 @@ namespace SciAdvNet.NSScript.Tests
             Assert.Equal(SyntaxTokenKind.EndOfFileToken, token.Kind);
         }
 
-        [Fact]
-        public void TestXmlSyntaxMode()
-        {
-            // 0. XmlElementStartTag (PRE)
-            // 1. Xml_TextStartTag
-            // 2. Xml_Text
-            // 3. Xml_Text
-            // 4. Xml_LineBreak
-            // 5. XmlElementStartTag (voice)
-            // 6. Xml_Text
-            // 7. XmlElementStartTag (FONT)
-            // 8. Xml_Text
-            // 9. XmlElementEndTag (FONT)
-            // 10. Xml_Text
-            // 11. Xml_LineBreak
-            // 12. XmlElementEndTag (PRE)
+        //[Fact]
+        //public void TestXmlSyntaxMode()
+        //{
+        //    // 0. XmlElementStartTag (PRE)
+        //    // 1. Xml_TextStartTag
+        //    // 2. Xml_Text
+        //    // 3. Xml_Text
+        //    // 4. Xml_LineBreak
+        //    // 5. XmlElementStartTag (voice)
+        //    // 6. Xml_Text
+        //    // 7. XmlElementStartTag (FONT)
+        //    // 8. Xml_Text
+        //    // 9. XmlElementEndTag (FONT)
+        //    // 10. Xml_Text
+        //    // 11. Xml_LineBreak
+        //    // 12. XmlElementEndTag (PRE)
 
-            string sourceText = TestScripts.Get("XmlSyntax.nss");
-            var tokens = NSScript.ParseTokens(sourceText).Where(x => x.IsXmlToken).ToList();
-            Assert.Equal(13, tokens.Count);
+        //    string sourceText = TestScripts.Get("XmlSyntax.nss");
+        //    var tokens = NSScript.ParseTokens(sourceText).Where(x => x.IsXmlToken).ToList();
+        //    Assert.Equal(13, tokens.Count);
 
-            Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[0].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_TextStartTag, tokens[1].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[2].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[3].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[4].Kind);
-            Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[5].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[6].Kind);
-            Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[7].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[8].Kind);
-            Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[9].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[10].Kind);
-            Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[11].Kind);
-            Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[12].Kind);
-        }
+        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[0].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_TextStartTag, tokens[1].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[2].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[3].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[4].Kind);
+        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[5].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[6].Kind);
+        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[7].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[8].Kind);
+        //    Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[9].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[10].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[11].Kind);
+        //    Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[12].Kind);
+        //}
 
         [Fact]
         public void TestIncludeDirective()
