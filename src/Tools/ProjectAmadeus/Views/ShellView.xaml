@@ -21,59 +21,75 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Background="{StaticResource LightBackground}">
-        <DockPanel>
-            <Menu DockPanel.Dock="Top" IsMainMenu="True" FontSize="16">
-                <MenuItem Header="File">
-                    <MenuItem x:Name="OpenFile" Header="Open File..." />
-                    <MenuItem x:Name="SaveAs" Header="Save As..." />
-                    <MenuItem x:Name="CloseFile" Header="Close File" />
-                    <Separator />
-                    <MenuItem x:Name="Exit" Header="Exit" />
-                </MenuItem>
+    <DockPanel Background="{StaticResource LightBackground}">
+        <Menu DockPanel.Dock="Top" IsMainMenu="True" FontSize="16">
+            <MenuItem Header="File">
+                <MenuItem x:Name="OpenFile" Header="Open File..." />
+                <MenuItem x:Name="SaveAs" Header="Save As..." />
+                <MenuItem x:Name="CloseFile" Header="Close File" />
+                <Separator />
 
-                <MenuItem Header="View">
+                <MenuItem Header="Flyout" Click="MenuItem_Click" />
+                <MenuItem x:Name="Exit" Header="Exit" />
+            </MenuItem>
 
-                </MenuItem>
+            <MenuItem Header="View">
 
-                <MenuItem Header="?" />
-            </Menu>
+            </MenuItem>
 
-            <Grid>
-                <ContentControl>
-                    <TextBlock FontSize="22" TextAlignment="Center" Foreground="{StaticResource Foreground}"
+            <MenuItem Header="?" />
+        </Menu>
+
+        <Grid x:Name="MainRegion">
+            <ContentControl>
+                <TextBlock FontSize="22" TextAlignment="Center" Foreground="{StaticResource Foreground}"
                                VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Button cm:Message.Attach="OpenFile" Style="{StaticResource HyperlinkButton}">
                             <Hyperlink>Open File</Hyperlink>
                         </Button>
                         <LineBreak />
                         or simply drop it here
-                    </TextBlock>
+                </TextBlock>
 
-                    <ContentControl.Style>
-                        <Style TargetType="ContentControl">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Items.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
 
-                <TabControl x:Name="Items" Margin="5,5,0,0">
-                    <TabControl.Style>
-                        <Style TargetType="TabControl" BasedOn="{StaticResource VSTabControlStyle}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Items.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TabControl.Style>
-                </TabControl>
-            </Grid>
-        </DockPanel>
-    </Grid>
+            <TabControl x:Name="Items" Margin="5,5,0,0">
+                <TabControl.Style>
+                    <Style TargetType="TabControl" BasedOn="{StaticResource VSTabControlStyle}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TabControl.Style>
+            </TabControl>
+
+            <!--<metro:Flyout AnimateOpacity="True" x:Name="flyout" Position="Top" CloseButtonVisibility="Collapsed" TitleVisibility="Collapsed">
+                    <Grid Height="150" Margin="0,0,20,0" Background="Brown">
+                        <TextBlock Text="Flyout on the top..." FontSize="22" Margin="10" />
+                        <Grid VerticalAlignment="Bottom" Background="{DynamicResource AccentColorBrush2}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="1" Style="{DynamicResource MetroFlatButton}" Margin="5" Content="_Save" IsEnabled="False" />
+                            <Button Grid.Column="2" Style="{DynamicResource MetroFlatButton}" Margin="5" IsCancel="True" Content="_Close" Click="Button_Click_1" />
+                        </Grid>
+                    </Grid>
+                </metro:Flyout>-->
+        </Grid>
+    </DockPanel>
 </metro:MetroWindow>

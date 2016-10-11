@@ -4,7 +4,7 @@
     "Caliburn.Micro": "3.0.0",
     "PropertyChanged.Fody": "1.51.0",
     "MahApps.Metro": "1.2.4",
-    "AvalonEdit": "5.0.2"
+    "AvalonEdit": "5.0.3"
   },
   "frameworks": {
     "net461": { }

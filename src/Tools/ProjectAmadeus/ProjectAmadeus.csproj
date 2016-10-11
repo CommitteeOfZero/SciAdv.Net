@@ -70,12 +70,16 @@
     <Compile Include="Services\IFilePicker.cs" />
     <Compile Include="ViewModels\GameStringViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\StringEditorViewModel.cs" />
     <Compile Include="ViewModels\TabViewModel.cs" />
     <Compile Include="Views\GameStringView.xaml.cs">
       <DependentUpon>GameStringView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StringEditorView.xaml.cs">
+      <DependentUpon>StringEditorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TabView.xaml.cs">
       <DependentUpon>TabView.xaml</DependentUpon>
@@ -123,6 +127,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StringEditorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

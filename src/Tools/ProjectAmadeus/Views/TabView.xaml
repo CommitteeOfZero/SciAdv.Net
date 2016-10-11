@@ -19,37 +19,5 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="LayoutRoot">
-        <DataGrid ItemsSource="{Binding Strings}" FontSize="18" AutoGenerateColumns="False" TargetUpdated="DataGrid_TargetUpdated"
-                  cm:Message.Attach="[Event RowEditEnding] = [UpdateRow($this.SelectedItem)]" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Foreground="Gray" />
-
-                <DataGridTextColumn Header="Name" Binding="{Binding CharacterName}" IsReadOnly="True" />
-
-                <DataGridTemplateColumn Header="Line" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding DialogueLine, Mode=TwoWay}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-
-                    <DataGridTemplateColumn.CellEditingTemplate>
-                        <DataTemplate>
-                            <TextBox Text="{Binding DialogueLine, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" />
-                            <!--<StackPanel>
-                                <TextBox Text="{Binding DialogueLine, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" TextWrapping="Wrap" />
-                            </StackPanel>-->
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellEditingTemplate>
-                    <!--<DataGridTextColumn.EditingElementStyle>
-                        <Style>
-                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
-                        </Style>
-                    </DataGridTextColumn.EditingElementStyle>-->
-
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+    
 </UserControl>

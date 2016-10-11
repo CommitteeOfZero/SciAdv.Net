@@ -4,6 +4,7 @@ using SciAdvNet.SC3;
 using SciAdvNet.SC3.Text;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace ProjectAmadeus.ViewModels
 {
@@ -13,51 +14,25 @@ namespace ProjectAmadeus.ViewModels
         {
         }
 
-        public string FilePath { get; set; }
-        public SC3Module Module { get; private set; }
-        public IList<GameStringViewModel> Strings { get; private set; }
-
-        protected override void OnInitialize()
+        public String FilePath
         {
-            base.OnInitialize();
+            get
+            {
+                throw new NotImplementedException();
+            }
 
-            string fileName = Path.GetFileName(FilePath);
-            DisplayName = fileName;
-
-            DecodeStrings();
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public void UpdateRow(GameStringViewModel row)
+        public SC3Module Module
         {
-            string updatedText;
-            if (!string.IsNullOrEmpty(row.CharacterName))
+            get
             {
-                updatedText = $"[name]{row.CharacterName}[line]{row.DialogueLine}";
+                throw new NotImplementedException();
             }
-            else
-            {
-                updatedText = row.DialogueLine;
-            }
-
-            Module.UpdateString(row.Id, SC3String.Deserialize(updatedText));
-        }
-
-        private void DecodeStrings()
-        {
-            var strings = new List<GameStringViewModel>();
-
-            Module = SC3Module.Load(FilePath);
-            foreach (var handle in Module.StringTable)
-            {
-                var sc3String = handle.Resolve();
-
-                string characterName = sc3String.GetCharacterName().ToString(normalize: true);
-                string line = sc3String.GetDialogueLine().ToString(normalize: true);
-
-                strings.Add(new GameStringViewModel(handle.Id, handle.Offset, characterName, line));
-            }
-
-            Strings = strings;
         }
 
         protected override void OnDeactivate(bool close)
