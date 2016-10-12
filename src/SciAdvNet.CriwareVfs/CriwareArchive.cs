@@ -1,4 +1,5 @@
 ﻿using SciAdvNet.Common;
+using SciAdvNet.Vfs;
 using System;
 using System.Collections.Immutable;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace SciAdvNet.CriwareVfs
 {
-    public sealed class CriwareArchive : IDisposable
+    public sealed class CriwareArchive : IArchive, IDisposable
     {
         public const string CpkSignature = "CPK ";
 
@@ -17,8 +18,9 @@ namespace SciAdvNet.CriwareVfs
 
         private CpkTable<CpkFileEntry> _toc;
 
-        private CriwareArchive(Stream stream, bool leaveOpen)
+        private CriwareArchive(Stream stream, ArchiveMode mode, bool leaveOpen)
         {
+            ArchiveMode = mode;
             _stream = stream;
             _leaveOpen = leaveOpen;
             _reader = new BinaryReader(_stream, Encoding.UTF8, leaveOpen);
@@ -35,21 +37,36 @@ namespace SciAdvNet.CriwareVfs
         }
 
         public CpkHeader Header { get; private set; }
-        public ImmutableArray<CpkFileEntry> Entries => _toc.Entries;
+        public ImmutableArray<IFileEntry> Entries { get; private set; }
+        public ArchiveMode ArchiveMode { get; }
+        public bool IsCompressed => false;
 
         internal Stream ArchiveStream => _stream;
 
-        public static CriwareArchive Load(Stream stream, bool leaveOpen = false)
+        public static CriwareArchive Load(Stream stream, ArchiveMode mode, bool leaveOpen = false)
         {
+            if (mode == ArchiveMode.Update)
+            {
+                throw new NotImplementedException("Update mode is not yet supported.");
+            }
+
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
+            if (!stream.CanRead)
+            {
+                throw new ArgumentException("The specified stream must me readable.", nameof(stream));
+            }
+            if (mode == ArchiveMode.Update && !stream.CanWrite)
+            {
+                throw new ArgumentException("The specified stream must be writeable.", nameof(stream));
+            }
 
-            return new CriwareArchive(stream, leaveOpen);
+            return new CriwareArchive(stream, mode, leaveOpen);
         }
 
-        public static CriwareArchive Load(string path)
+        public static CriwareArchive Load(string path, ArchiveMode mode)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -57,10 +74,10 @@ namespace SciAdvNet.CriwareVfs
             }
 
             var stream = File.OpenRead(path);
-            return new CriwareArchive(stream, leaveOpen: false);
+            return new CriwareArchive(stream, mode, leaveOpen: false);
         }
 
-        public CpkFileEntry GetEntry(int id)
+        public IFileEntry GetEntry(int id)
         {
             if (id < 0 || id >= Entries.Length)
             {
@@ -76,7 +93,7 @@ namespace SciAdvNet.CriwareVfs
             return entry;
         }
 
-        public CpkFileEntry GetEntry(string name)
+        public IFileEntry GetEntry(string name)
         {
             var entry = Entries.SingleOrDefault(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (entry == null)
@@ -115,6 +132,8 @@ namespace SciAdvNet.CriwareVfs
             {
                 entry.Archive = this;
             }
+
+            Entries = _toc.Entries.As<IFileEntry>();
         }
 
         private void ReleaseResources()
@@ -124,6 +143,11 @@ namespace SciAdvNet.CriwareVfs
                 _reader?.Dispose();
                 _stream?.Dispose();
             }
+        }
+
+        public void SaveChanges()
+        {
+            throw new NotImplementedException();
         }
     }
 }
