@@ -13,7 +13,7 @@ namespace Ungelify
     {
         private static readonly List<Decoder> SupportedDecoders = new List<Decoder>()
         {
-            //new CpkDecoder(),
+            new CpkDecoder(),
             new MpkDecoder()
         };
 
@@ -32,21 +32,21 @@ namespace Ungelify
         public abstract IArchive LoadArchive(Stream stream);
     }
 
-    //public sealed class CpkDecoder : Decoder
-    //{
-    //    public override bool IsSupportedArchive(Stream stream)
-    //    {
-    //        using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
-    //        {
-    //            return new string(reader.PeekChars(4)) == CriwareArchive.CpkSignature;
-    //        }
-    //    }
+    public sealed class CpkDecoder : Decoder
+    {
+        public override bool IsSupportedArchive(Stream stream)
+        {
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true))
+            {
+                return new string(reader.PeekChars(4)) == CriwareArchive.CpkSignature;
+            }
+        }
 
-    //    public override IArchive LoadArchive(Stream stream)
-    //    {
-    //        return new CpkArchive(stream);
-    //    }
-    //}
+        public override IArchive LoadArchive(Stream stream)
+        {
+            return CriwareArchive.Load(stream, ArchiveMode.Read);
+        }
+    }
 
     public sealed class MpkDecoder : Decoder
     {

@@ -50,7 +50,12 @@
     <Compile Include="CriwareArchive.cs" />
     <Compile Include="CpkFileEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SubReadStream.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SciAdvNet.Vfs\SciAdvNet.Vfs.csproj">
+      <Project>{57c40f3d-568e-4055-b1b2-534740324d32}</Project>
+      <Name>SciAdvNet.Vfs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\SciAdvNet.Common\SciAdvNet.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
