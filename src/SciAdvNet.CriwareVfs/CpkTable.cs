@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace SciAdvNet.CriwareVfs
 {
@@ -41,7 +42,7 @@ namespace SciAdvNet.CriwareVfs
 
         public static CpkTable<TEntry> Parse(byte[] bytes)
         {
-            string signature = new string(bytes.Take(4).Select(x => Convert.ToChar(x)).ToArray());
+            string signature = Encoding.ASCII.GetString(bytes.Take(4).ToArray());
             if (signature != UtfSignature)
             {
                 return Parse(CpkTableEncryption.Decrypt(bytes));
