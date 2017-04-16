@@ -8,9 +8,9 @@ namespace SciAdvNet.SC3
     {
         private readonly Lazy<ImmutableArray<byte>> _data;
 
-        protected MetadataEntity(SC3Module module, int id, int offset, int length)
+        protected MetadataEntity(SC3Script script, int id, int offset, int length)
         {
-            Module = module;
+            Script = script;
             Id = id;
             Offset = offset;
             Length = length;
@@ -18,7 +18,7 @@ namespace SciAdvNet.SC3
             _data = new Lazy<ImmutableArray<byte>>(ReadData);
         }
 
-        public SC3Module Module { get; }
+        public SC3Script Script { get; }
         public int Id { get; }
         public int Offset { get; }
         public int EndOffset => Offset + Length;
@@ -36,15 +36,15 @@ namespace SciAdvNet.SC3
 
         private ImmutableArray<byte> ReadData()
         {
-            Module.ModuleStream.Position = Offset;
-            return Module.ModuleReader.ReadBytes(Length).ToImmutableArray();
+            Script.Stream.Position = Offset;
+            return Script.Reader.ReadBytes(Length).ToImmutableArray();
         }
     }
 
     public class BlockDefinition : MetadataEntity
     {
-        internal BlockDefinition(SC3Module module, int id, int offset, int length)
-            : base(module, id, offset, length)
+        internal BlockDefinition(SC3Script script, int id, int offset, int length)
+            : base(script, id, offset, length)
         {
         }
 
@@ -57,7 +57,7 @@ namespace SciAdvNet.SC3
     public sealed class CodeBlockDefinition : MetadataEntity
     {
         internal CodeBlockDefinition(BlockDefinition blockDef)
-            : base(blockDef.Module, blockDef.Id, blockDef.Offset, blockDef.Length)
+            : base(blockDef.Script, blockDef.Id, blockDef.Offset, blockDef.Length)
         {
         }
     }
@@ -65,7 +65,7 @@ namespace SciAdvNet.SC3
     public sealed class DataBlockDefinition : MetadataEntity
     {
         internal DataBlockDefinition(BlockDefinition blockDef, ArrayDataType dataType)
-            : base(blockDef.Module, blockDef.Id, blockDef.Offset, blockDef.Length)
+            : base(blockDef.Script, blockDef.Id, blockDef.Offset, blockDef.Length)
         {
             DataType = dataType;
         }
@@ -75,12 +75,12 @@ namespace SciAdvNet.SC3
 
     public sealed class StringHandle : MetadataEntity
     {
-        internal StringHandle(SC3Module module, int id, int offset, int length)
-            : base(module, id, offset, length)
+        internal StringHandle(SC3Script script, int id, int offset, int length)
+            : base(script, id, offset, length)
         {
         }
 
-        public SC3String Resolve() => Module.GetString(Id);
+        public SC3String Resolve() => Script.GetString(Id);
     }
 
 

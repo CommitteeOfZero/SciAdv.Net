@@ -71,21 +71,6 @@ namespace SciAdvNet.NSScript.Tests
         }
 
         [Fact]
-        public void TestMethodCall()
-        {
-            string text = "WaitKey(10000);";
-            var call = NSScript.ParseExpression(text) as MethodCall;
-            Assert.NotNull(call);
-            Assert.Equal(SyntaxNodeKind.MethodCall, call.Kind);
-            Assert.Equal("WaitKey", call.TargetMethodName.FullName);
-            Assert.Equal(call.TargetMethodName.FullName, call.TargetMethodName.SimplifiedName);
-            Assert.Equal(SigilKind.None, call.TargetMethodName.Sigil);
-            Assert.Equal(1, call.Arguments.Length);
-
-            Assert.Equal(text, call.ToString());
-        }
-
-        [Fact]
         public void TestUnaryOperators()
         {
             TestUnary(UnaryOperationKind.LogicalNegation);
@@ -189,7 +174,7 @@ namespace SciAdvNet.NSScript.Tests
         public void TestVariableReference()
         {
             string text = "SomeMethod($a);";
-            var invocation = NSScript.ParseExpression(text) as MethodCall;
+            var invocation = NSScript.ParseStatement(text) as MethodCall;
 
             var arg = invocation.Arguments[0] as Variable;
             Assert.NotNull(arg);
@@ -203,10 +188,9 @@ namespace SciAdvNet.NSScript.Tests
             var root = NSScript.ParseScript(text);
             var method = root.Methods[0];
 
-            var expressionStatement = method.Body.Statements[0] as ExpressionStatement;
-            Assert.NotNull(expressionStatement);
-            var invocation = expressionStatement.Expression as MethodCall;
+            var invocation = method.Body.Statements[0] as MethodCall;
             Assert.NotNull(invocation);
+           
             var arg = invocation.Arguments[0] as ParameterReference;
             Assert.NotNull(arg);
             Assert.Equal(SyntaxNodeKind.Parameter, arg.Kind);
@@ -228,9 +212,7 @@ namespace SciAdvNet.NSScript.Tests
             var root = NSScript.ParseScript(text);
             var method = root.Methods[0];
 
-            var expressionStatement = method.Body.Statements[0] as ExpressionStatement;
-            Assert.NotNull(expressionStatement);
-            var invocation = expressionStatement.Expression as MethodCall;
+            var invocation = method.Body.Statements[0] as MethodCall;
             Assert.NotNull(invocation);
             var arg = invocation.Arguments[0] as ParameterReference;
             Assert.NotNull(arg);
@@ -247,9 +229,7 @@ namespace SciAdvNet.NSScript.Tests
             var root = NSScript.ParseScript(text);
             var method = root.Methods[0];
 
-            var expressionStatement = method.Body.Statements[0] as ExpressionStatement;
-            Assert.NotNull(expressionStatement);
-            var invocation = expressionStatement.Expression as MethodCall;
+            var invocation = method.Body.Statements[0] as MethodCall;
             Assert.NotNull(invocation);
             var arg = invocation.Arguments[0] as ParameterReference;
             Assert.NotNull(arg);
@@ -272,9 +252,7 @@ namespace SciAdvNet.NSScript.Tests
             var root = NSScript.ParseScript(text);
             var method = root.Methods[0];
 
-            var expressionStatement = method.Body.Statements[0] as ExpressionStatement;
-            Assert.NotNull(expressionStatement);
-            var invocation = expressionStatement.Expression as MethodCall;
+            var invocation = method.Body.Statements[0] as MethodCall;
             Assert.NotNull(invocation);
             var arg = invocation.Arguments[0] as ParameterReference;
             Assert.NotNull(arg);

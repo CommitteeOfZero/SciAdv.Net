@@ -4,6 +4,7 @@ using System.Windows;
 using System;
 using System.Collections.Generic;
 using ProjectAmadeus.Services;
+using ProjectAmadeus.Models;
 
 namespace ProjectAmadeus
 {
@@ -25,9 +26,18 @@ namespace ProjectAmadeus
             }
 
             _container.Singleton<IWindowManager, WindowManager>();
+            _container.Singleton<IEventAggregator, EventAggregator>();
             _container.Singleton<IFilePicker, FilePicker>();
             _container.Singleton<ShellViewModel>();
-            _container.PerRequest<ITab, TabViewModel>();
+            _container.Singleton<NotificationAreaViewModel>();
+
+            _container.PerRequest<DocumentViewModel>();
+            _container.PerRequest<StringTableViewModel>();
+            _container.PerRequest<CodeEditorViewModel>();
+            _container.PerRequest<FontEditorViewModel>();
+
+            _container.Singleton<Workspace>();
+            _container.Singleton<SharedData>();
         }
 
         protected override void OnStartup(object sender, StartupEventArgs e)

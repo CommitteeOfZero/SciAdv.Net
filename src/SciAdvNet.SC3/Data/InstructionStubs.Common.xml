@@ -6,7 +6,9 @@
     expr assignmentStatement
   </InstructionStub>
 
-  <InstructionStub Opcode="0000" Name="EndOfScript" />
+  <InstructionStub Opcode="0000" Name="EndOfScript">
+    byte zero
+  </InstructionStub>
   <InstructionStub Opcode="0001" Name="CreateThread">
     expr threadId, expr slot, ushort codeBlockId
   </InstructionStub>
@@ -20,9 +22,17 @@
     expr slot, expr scriptId
   </InstructionStub>
 
+  <InstructionStub Opcode="0005" Name="Sleep">
+    expr value
+  </InstructionStub>
+
   <InstructionStub Opcode="0006" Name="Halt" />
   <InstructionStub Opcode="0007" Name="Jump">
     ushort targetBlockId
+  </InstructionStub>
+
+  <InstructionStub Opcode="000A" Name="JumpIf">
+    byte expectedValue, expr actual, ushort codeBlockId
   </InstructionStub>
 
   <InstructionStub Opcode="000D" Name="CallFar">
@@ -31,8 +41,8 @@
 
   <InstructionStub Opcode="000E" Name="Return" />
 
-  <InstructionStub Opcode="0010" Name="JumpOnFlag">
-    byte expectedValue, expr flagId, expr targetBlockId
+  <InstructionStub Opcode="0010" Name="JumpIfEquals">
+    byte expectedValue, expr flagId, ushort targetBlockId
   </InstructionStub>
 
   <InstructionStub Opcode="0011" Name="WaitForFlag">
@@ -47,20 +57,38 @@
     expr flagId
   </InstructionStub>
 
+  <InstructionStub Opcode="0014" Name="CopyFlag">
+    expr srcFlagId, expr destFlagId
+  </InstructionStub>
+
   <InstructionStub Opcode="0021" Name="PlayBgm">
     byte loop, expr bgmId
   </InstructionStub>
 
   <InstructionStub Opcode="0022" Name="StopBgm">
-    byte unk
+    byte zero
   </InstructionStub>
 
-  <InstructionStub Opcode="0023" Name="PlaySfx">
-    ushort unk1, expr unk2, expr unk3
+  <!--<InstructionStub Opcode="00230002" Name="UNK_SfxRelated" />-->
+
+  <InstructionStub Opcode="0023" Name="PlaySoundEffect">
+    byte channel, byte action, expr effectId, expr loop
   </InstructionStub>
 
-  <InstructionStub Opcode="0024" Name="StopSfx">
+  <!--if (action == 0x02)-->
+  <!--<InstructionStub Opcode="0023" Name="SfxRelated_0x0023">
+    byte channel, byte action
+  </InstructionStub>-->
+
+  <InstructionStub Opcode="00230002" Name="Unk_SfxRelated">
+  </InstructionStub>
+
+  <InstructionStub Opcode="0024" Name="StopSoundEffect">
     byte channelId
+  </InstructionStub>
+
+  <InstructionStub Opcode="002A" Name="UNK_002A">
+    byte arg
   </InstructionStub>
 
   <InstructionStub Opcode="002E" Name="DisplayChapterName">
@@ -71,56 +99,127 @@
     expr delay, expr unkExpr
   </InstructionStub>
 
+  <InstructionStub Opcode="003701" Name="PlayVoice2">
+    expr arg1, expr arg2
+  </InstructionStub>
+
+  <InstructionStub Opcode="003800" Name="StopVoice">
+    expr arg
+  </InstructionStub>
+
+  <InstructionStub Opcode="003801" Name="StopVoiceWithFade">
+    expr arg
+  </InstructionStub>
+
   <InstructionStub Opcode="0100" Name="CreateSurface">
     byte unkByte, expr surfaceId, expr width, expr height
   </InstructionStub>
 
+  <InstructionStub Opcode="0101" Name="ReleaseSurface">
+    expr surfaceId
+  </InstructionStub>
+
   <InstructionStub Opcode="0102" Name="LoadTexture">
-    expr surfaceId, expr unkExpr, expr textureId
+    expr surfaceId, expr textureKind, expr textureId
   </InstructionStub>
 
-  <InstructionStub Opcode="0109" Name="Checkpoint">
-    byte null, ushort checkpointId
+  <InstructionStub Opcode="010500" Name="CalcSin">
+    expr out, expr angle
   </InstructionStub>
 
-  <InstructionStub Opcode="010B" Name="ClearDialogueWindow" />
+  <InstructionStub Opcode="010501" Name="CalcCos">
+    expr out, expr angle
+  </InstructionStub>
 
-  <InstructionStub Opcode="010C00" Name="LoadDialogueLine">
+  <InstructionStub Opcode="010502" Name="CalcAtan">
+    expr out, expr x, expr y
+  </InstructionStub>
+
+  <InstructionStub Opcode="010503" Name="CalcSinL">
+    expr out, expr base, expr angle, expr offset
+  </InstructionStub>
+
+  <InstructionStub Opcode="010504" Name="CalcCosL">
+    expr out, expr base, expr angle, expr offset
+  </InstructionStub>
+
+  <InstructionStub Opcode="010505" Name="CalcRound">
+    expr out, expr value, expr multiplier, expr divider
+  </InstructionStub>
+
+  <InstructionStub Opcode="010506" Name="CalcUnknown">
+    expr out, expr x, expr a, expr b
+  </InstructionStub>
+
+
+  <InstructionStub Opcode="010900" Name="Checkpoint">
+    ushort index
+  </InstructionStub>
+
+  <InstructionStub Opcode="010901" Name="Checkpoint_01">
+    ushort index, expr unkExpr
+  </InstructionStub>
+
+  <InstructionStub Opcode="010902" Name="Checkpoint_02">
+    expr arg
+  </InstructionStub>
+
+  <InstructionStub Opcode="010B" Name="ClearDialogueBox" />
+
+  <InstructionStub Opcode="010C00" Name="LoadDialogue">
     expr characterId, ushort lineId
   </InstructionStub>
 
-  <InstructionStub Opcode="010C03" Name="LoadVoiceActedDialogueLine">
-    expr audioId, expr animationId, expr lineId, ushort unk
+  <InstructionStub Opcode="010C03" Name="LoadVoicedDialogue">
+    expr audioId, expr animationId, expr characterId, ushort lineId
   </InstructionStub>
 
-  <InstructionStub Opcode="010D00" Name="DisplayDialogueLine" />
+  <InstructionStub Opcode="010D00" Name="DisplayDialogue" />
 
   <InstructionStub Opcode="010E" Name="InstantiateTextStyle">
     expr instanceId, ushort styleDataBlockId
   </InstructionStub>
 
   <InstructionStub Opcode="010F" Name="SetNGmoji">
-    expr unkStringId
+    ushort unk1, ushort unk2, ushort unk3
   </InstructionStub>
 
-  <InstructionStub Opcode="011101" Name="ShowDialogueWindow" />
-  <InstructionStub Opcode="011102" Name="AwaitShowDialogueWindow" />
-  <InstructionStub Opcode="011103" Name="AwaitHideDialogueWindow"/>
-  <InstructionStub Opcode="011105" Name="HideDialogueWindow">
-    expr unk
+  <InstructionStub Opcode="011101" Name="ShowDialogueBox" />
+  <InstructionStub Opcode="011102" Name="AwaitShowDialogueBox" />
+  <InstructionStub Opcode="011103" Name="AwaitHideDialogueBox"/>
+  <InstructionStub Opcode="011105" Name="HideDialogueBox">
+    expr arg
+  </InstructionStub>
+
+  <InstructionStub Opcode="011106" Name="HideDialogueBoxSlow">
+    expr arg
+  </InstructionStub>
+
+  <InstructionStub Opcode="011107" Name="HideDialogueWindowFast">
+    expr arg
   </InstructionStub>
 
   <InstructionStub Opcode="0121" Name="InstantiateStringArray">
     expr instanceId, ushort dataBlockId
   </InstructionStub>
 
+  <InstructionStub Opcode="012302" Name="StopCutscene" />
+
+  <InstructionStub Opcode="0124" Name="LoadCutscene">
+    expr cutscene
+  </InstructionStub>
+
+  <InstructionStub Opcode="01260500" Name="PlayCutsceneLoopNoBgm">
+    expr cutscene
+  </InstructionStub>
+
   <InstructionStub Opcode="1000" Name="InitSubsystem" />
   <InstructionStub Opcode="1001" Name="LoadBackground">
-    expr unk1, expr backgroundId
+    expr bufVariable, expr backgroundId
   </InstructionStub>
 
   <InstructionStub Opcode="100500" Name="LoadCharacter">
-    expr buf, expr unk1, ushort unk2
+    expr bufVariable, expr imageIdAndPose, ushort unk
   </InstructionStub>
 
   <InstructionStub Opcode="102200" Name="QuickSave" />
@@ -131,7 +230,48 @@
 
   <InstructionStub Opcode="1022FF" Name="State_UNKFF" />
 
-  <InstructionStub Opcode="1029" Name="SetEVFlag">
-    expr unkExpr
+  <InstructionStub Name="OpenTip" Opcode="102700">
+    expr tip
   </InstructionStub>
+
+  <InstructionStub Opcode="1029" Name="SetEnvFlag">
+    expr flag
+  </InstructionStub>
+
+  <InstructionStub Opcode="1002" Name="SwapBackgrounds">
+    expr bg1, expr bg2
+  </InstructionStub>
+
+  <InstructionStub Opcode="1007" Name="CopyBackground">
+    expr src, expr dest
+  </InstructionStub>
+
+  <InstructionStub Opcode="1037" Name="Unk_1037">
+    byte arg
+  </InstructionStub>
+  
+  <InstructionStub Opcode="005401" Name="Unk_0054">
+    expr arg1, ushort arg2, ushort arg3
+  </InstructionStub>
+
+  <InstructionStub Opcode="000B" Name="Unk_000B">
+    ushort arg1, ushort arg2
+  </InstructionStub>
+
+  <InstructionStub Opcode="005601" Name="Unk_0x0056">
+    expr arg1, expr arg2, ushort arg3, ushort arg4
+  </InstructionStub>
+
+  <InstructionStub Opcode="010C0B" Name="Unk_010C0B">
+    expr audioId, expr animationId, expr characterId, ushort lineId
+  </InstructionStub>
+
+  <InstructionStub Opcode="0108" Name="Unk_0108">
+    byte arg
+  </InstructionStub>
+
+  <InstructionStub Opcode="010A" Name="Unk_010A">
+    byte arg
+  </InstructionStub>
+
 </InstructionStubs>

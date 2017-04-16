@@ -11,35 +11,34 @@ namespace SciAdvNet.SC3.Text
     /// </summary>
     public sealed class SC3String
     {
-        public static readonly SC3String Empty = new SC3String(ImmutableArray<SC3StringSegment>.Empty);
+        public static readonly SC3String Empty = new SC3String(ImmutableArray<SC3StringSegment>.Empty, false);
 
         private static readonly Dictionary<SC3Game, Lazy<SC3StringEncoder>> s_encoders;
         private static readonly Dictionary<SC3Game, Lazy<SC3StringDecoder>> s_decoders;
-        private static readonly DefaultSC3StringSerializer s_serializer;
-        private static readonly DefaultSC3StringDeserializer s_deserializer;
 
         static SC3String()
         {
-            s_serializer = new DefaultSC3StringSerializer();
-            s_deserializer = new DefaultSC3StringDeserializer();
             s_encoders = new Dictionary<SC3Game, Lazy<SC3StringEncoder>>();
             s_decoders = new Dictionary<SC3Game, Lazy<SC3StringDecoder>>();
-            foreach (var game in GameSpecificData.SupportedGames)
+            foreach (var game in GameSpecificData.KnownGames)
             {
                 s_encoders[game] = new Lazy<SC3StringEncoder>(() => new SC3StringEncoder(game));
                 s_decoders[game] = new Lazy<SC3StringDecoder>(() => new SC3StringDecoder(game));
             }
         }
 
-        internal SC3String(ImmutableArray<SC3StringSegment> segments)
+        public SC3String(ImmutableArray<SC3StringSegment> segments, bool isProperlyTerminated)
         {
             Segments = segments;
+            IsProperlyTerminated = isProperlyTerminated;
         }
 
         /// <summary>
         /// The collection of segments that this instance of <see cref="SC3String"/> consists of. 
         /// </summary>
         public ImmutableArray<SC3StringSegment> Segments { get; }
+
+        public bool IsProperlyTerminated { get; }
 
         public static SC3String FromBytes(byte[] bytes, SC3Game game)
         {
@@ -55,7 +54,7 @@ namespace SciAdvNet.SC3.Text
 
         public static SC3String Deserialize(string text)
         {
-            return s_deserializer.Deserialize(text);
+            return DefaultSC3StringDeserializer.Instance.Deserialize(text);
         }
 
         public static SC3String Deserialize(string text, SC3StringDeserializer deserializer)
@@ -79,8 +78,8 @@ namespace SciAdvNet.SC3.Text
                 return SC3String.Empty;
             }
 
-            var marker = Segments[0] as Marker;
-            if (marker == null || marker.MarkerKind != MarkerKind.CharacterName)
+            var command = Segments[0] as EmbeddedCommand;
+            if (command == null || command.CommandKind != EmbeddedCommandKind.CharacterNameStart)
             {
                 return this;
             }
@@ -88,7 +87,7 @@ namespace SciAdvNet.SC3.Text
             int idxNameSegment = -1;
             for (int i = 0; i < Segments.Length; i++)
             {
-                if ((Segments[i] as Marker)?.MarkerKind == MarkerKind.DialogueLine)
+                if ((Segments[i] as EmbeddedCommand)?.CommandKind == EmbeddedCommandKind.DialogueLineStart)
                 {
                     idxNameSegment = i;
                     break;
@@ -101,7 +100,7 @@ namespace SciAdvNet.SC3.Text
             }
 
             var segments = Segments.Skip(idxNameSegment + 1);
-            return new SC3String(segments.ToImmutableArray());
+            return new SC3String(segments.ToImmutableArray(), false);
         }
 
         /// <summary>
@@ -115,25 +114,19 @@ namespace SciAdvNet.SC3.Text
                 return SC3String.Empty;
             }
 
-            var marker = Segments[0] as Marker;
-            if (marker == null || marker.MarkerKind != MarkerKind.CharacterName)
+            var command = Segments[0] as EmbeddedCommand;
+            if (command == null || command.CommandKind != EmbeddedCommandKind.CharacterNameStart)
             {
                 return SC3String.Empty;
             }
 
-            var segments = Segments.Skip(1).TakeWhile(s => (s as Marker)?.MarkerKind != MarkerKind.DialogueLine);
-            return new SC3String(segments.ToImmutableArray());
+            var segments = Segments.Skip(1).TakeWhile(s => (s as EmbeddedCommand)?.CommandKind != EmbeddedCommandKind.DialogueLineStart);
+            return new SC3String(segments.ToImmutableArray(), false);
         }
 
         public override string ToString()
         {
-            return ToString(normalize: false);
-        }
-
-        public string ToString(bool normalize)
-        {
-            string s = s_serializer.Serialize(this);
-            return normalize ? StringUtils.ReplaceFullwidthLatinWithAscii(s) : s;
+            return DefaultSC3StringSerializer.Instance.Serialize(this);
         }
     }
 
@@ -142,18 +135,22 @@ namespace SciAdvNet.SC3.Text
         public abstract SC3StringSegmentKind SegmentKind { get; }
 
         internal abstract void Accept(SC3StringSegmentVisitor visitor);
+
+        public override String ToString()
+        {
+            return DefaultSC3StringSerializer.Instance.SerializeSegment(this);
+        }
     }
 
     public enum SC3StringSegmentKind
     {
         Text,
-        Marker,
         EmbeddedCommand
     }
 
     public sealed class TextSegment : SC3StringSegment
     {
-        internal TextSegment(string value)
+        public TextSegment(string value)
         {
             Value = value;
         }
@@ -167,31 +164,6 @@ namespace SciAdvNet.SC3.Text
         }
     }
 
-    public sealed class Marker : SC3StringSegment
-    {
-        internal Marker(MarkerKind markerKind)
-        {
-            MarkerKind = markerKind;
-        }
-
-        public MarkerKind MarkerKind { get; }
-        public override SC3StringSegmentKind SegmentKind => SC3StringSegmentKind.Marker;
-
-        internal override void Accept(SC3StringSegmentVisitor visitor)
-        {
-            visitor.VisitMarker(this);
-        }
-    }
-
-    public enum MarkerKind
-    {
-        CharacterName,
-        DialogueLine,
-        RubyBase,
-        RubyTextStart,
-        RubyTextEnd
-    }
-
     public abstract class EmbeddedCommand : SC3StringSegment
     {
         public override SC3StringSegmentKind SegmentKind => SC3StringSegmentKind.EmbeddedCommand;
@@ -200,17 +172,80 @@ namespace SciAdvNet.SC3.Text
 
     public enum EmbeddedCommandKind
     {
-        SetColor,
-        SetMargin,
-        CenterText,
-        EvaluateExpression,
+        LineBreak,
+        CharacterNameStart,
+        DialogueLineStart,
         Present,
-        SetFontSize
+        SetColor,
+        RubyBaseStart,
+        RubyTextStart,
+        RubyTextEnd,
+        SetFontSize,
+        PrintInParallel,
+        CenterText,
+        SetMargin,
+        GetHardcodedValue,
+        EvaluateExpression,
+        AutoForward,
+        Unknown
+    }
+
+    public sealed class LineBreakCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.LineBreak;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitLineBreakCommand(this);
+        }
+    }
+
+    public sealed class CharacterNameStartCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.CharacterNameStart;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitCharacterNameStartCommand(this);
+        }
+    }
+
+    public sealed class DialogueLineStartCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.DialogueLineStart;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitDialogueLineStartCommand(this);
+        }
+    }
+
+    public sealed class PresentCommand : EmbeddedCommand
+    {
+        public enum Action
+        {
+            None,
+            ResetTextAlignment,
+            Unknown_0x18
+        }
+
+        internal PresentCommand(PresentCommand.Action attachedAction)
+        {
+            AttachedAction = attachedAction;
+        }
+
+        public PresentCommand.Action AttachedAction { get; }
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.Present;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitPresentCommand(this);
+        }
     }
 
     public sealed class SetColorCommand : EmbeddedCommand
     {
-        internal SetColorCommand(Expression colorIndex)
+        public SetColorCommand(Expression colorIndex)
         {
             ColorIndex = colorIndex;
         }
@@ -224,9 +259,39 @@ namespace SciAdvNet.SC3.Text
         }
     }
 
+    public sealed class RubyBaseStartCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.RubyBaseStart;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitRubyBaseStartCommand(this);
+        }
+    }
+
+    public sealed class RubyTextStartCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.RubyTextStart;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitRubyTextStartCommand(this);
+        }
+    }
+
+    public sealed class RubyTextEndCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.RubyTextEnd;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitRubyTextEndCommand(this);
+        }
+    }
+
     public sealed class SetFontSizeCommand : EmbeddedCommand
     {
-        internal SetFontSizeCommand(int fontSize)
+        public SetFontSizeCommand(int fontSize)
         {
             FontSize = fontSize;
         }
@@ -240,12 +305,18 @@ namespace SciAdvNet.SC3.Text
         }
     }
 
+    public sealed class PrintInParallelCommand : EmbeddedCommand
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.PrintInParallel;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitPrintInParallelCommand(this);
+        }
+    }
+
     public sealed class CenterTextCommand : EmbeddedCommand
     {
-        internal CenterTextCommand()
-        {
-        }
-
         public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.CenterText;
 
         internal override void Accept(SC3StringSegmentVisitor visitor)
@@ -273,6 +344,22 @@ namespace SciAdvNet.SC3.Text
         }
     }
 
+    public sealed class GetHardcodedValueCommand : EmbeddedCommand
+    {
+        public GetHardcodedValueCommand(int index)
+        {
+            Index = index;
+        }
+
+        public int Index { get; }
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.GetHardcodedValue;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitGetHardcodedValueCommand(this);
+        }
+    }
+
     public sealed class EvaluateExpressionCommand : EmbeddedCommand
     {
         internal EvaluateExpressionCommand(Expression expression)
@@ -289,19 +376,29 @@ namespace SciAdvNet.SC3.Text
         }
     }
 
-    public sealed class PresentCommand : EmbeddedCommand
+    public sealed class AutoForwardCommand : EmbeddedCommand
     {
-        internal PresentCommand(bool resetTextAlignment)
-        {
-            ResetTextAlignment = resetTextAlignment;
-        }
-
-        public bool ResetTextAlignment { get; }
-        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.Present;
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.AutoForward;
 
         internal override void Accept(SC3StringSegmentVisitor visitor)
         {
-            visitor.VisitPresentCommand(this);
+            visitor.VisitAutoForwardCommand(this);
+        }
+    }
+
+    public sealed class UnknownCommand : EmbeddedCommand
+    {
+        public UnknownCommand(ImmutableArray<byte> bytes)
+        {
+            Bytes = bytes;
+        }
+
+        public ImmutableArray<byte> Bytes { get; }
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.Unknown;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitUnknownCommand(this);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using SciAdvNet.Common;
-using SciAdvNet.CriwareVfs;
-using SciAdvNet.MagesVfs;
 using SciAdvNet.Vfs;
+using SciAdvNet.Vfs.Criware;
+using SciAdvNet.Vfs.Mages;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

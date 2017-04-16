@@ -11,14 +11,14 @@ namespace SciAdvNet.SC3
         {
         }
 
-        public override void WriteCodeBlock(CodeBlock codeBlock)
+        public override void WriteCodeBlock(DecompilationResult codeBlock)
         {
             Visit(codeBlock);
         }
 
-        public override void VisitCodeBlock(CodeBlock codeBlock)
+        public override void VisitCodeBlock(DecompilationResult codeBlock)
         {
-            Write($"#label_{codeBlock.Definition.Id}:");
+            Write($"#label_{codeBlock.CodeBlock.Id}:");
             WriteLine();
             Indent();
 

@@ -2,60 +2,60 @@
 {
     public abstract class Reference
     {
-        internal Reference(SC3Module module)
+        internal Reference(SC3Script script)
         {
-            Module = module;
+            Script = script;
         }
 
-        public SC3Module Module { get; }
+        public SC3Script Script { get; }
     }
 
     public abstract class LabelReference : Reference
     {
-        internal LabelReference(SC3Module module)
-            : base(module)
+        internal LabelReference(SC3Script script)
+            : base(script)
         {
         }
     }
 
     public sealed class CodeBlockReference : LabelReference
     {
-        internal CodeBlockReference(SC3Module module, int blockId)
-            : base(module)
+        internal CodeBlockReference(SC3Script script, int blockId)
+            : base(script)
         {
             BlockId = blockId;
         }
 
         public int BlockId { get; }
 
-        public CodeBlockDefinition Resove() => Module.Blocks[BlockId].AsCode();
+        public CodeBlockDefinition Resove() => Script.Blocks[BlockId].AsCode();
     }
 
     public sealed class ExternalCodeBlockReference : LabelReference
     {
-        internal ExternalCodeBlockReference(SC3Module module, int blockId)
-            : base(module)
+        internal ExternalCodeBlockReference(SC3Script script, int blockId)
+            : base(script)
         {
             BlockId = blockId;
         }
 
         public int BlockId { get; }
 
-        public CodeBlockDefinition Resove(SC3Module externalModule) => externalModule.Blocks[BlockId].AsCode();
+        public CodeBlockDefinition Resove(SC3Script script) => script.Blocks[BlockId].AsCode();
     }
 
     public class DataBlockReference : LabelReference
     {
-        internal DataBlockReference(SC3Module module, Expression blockId)
-            : base(module)
+        internal DataBlockReference(SC3Script script, Expression blockId)
+            : base(script)
         {
         }
     }
 
     public sealed class StringReference : Reference
     {
-        internal StringReference(SC3Module module, int stringId)
-            : base(module)
+        internal StringReference(SC3Script script, int stringId)
+            : base(script)
         {
             StringId = stringId;
         }

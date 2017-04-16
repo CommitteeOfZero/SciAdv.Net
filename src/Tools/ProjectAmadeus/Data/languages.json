@@ -1,0 +1,21 @@
+﻿[
+  {
+    "name": "Japanese",
+    "code": 1,
+    "characters": ""
+  },
+
+  {
+    "name": "English",
+    "code": 2,
+    "characters": ""
+  },
+
+  {
+    "name": "Russian",
+    "code": 3,
+    "characters": "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+  }
+
+  // ...
+]

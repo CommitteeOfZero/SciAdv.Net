@@ -1,4 +1,7 @@
 ﻿using SciAdvNet.SC3.Text;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 using Xunit;
 
 namespace SciAdvNet.SC3.Tests
@@ -6,198 +9,160 @@ namespace SciAdvNet.SC3.Tests
     public sealed class StringDecodingTests
     {
         [Fact]
-        public void TestDecodingText()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeTextSegment(game);
-            }
-        }
-
-        [Fact]
-        public void TestDecodingLineBreak()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeLineBreak(game);
-            }
-        }
-
-
-        [Fact]
-        public void TestDecodingCharacterNameMarker()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeCharacterNameMarker(game);
-            }
-        }
-
-
-        [Fact]
-        public void TestDecodingDialogueLine()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeDialogueLineMarker(game);
-            }
-        }
-
-        [Fact]
-        public void TestDecodingPresentCommand()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodePresentCommand(game);
-                DecodePresentCommand_ResetAlignment(game);
-            }
-        }
-
-        [Fact]
-        public void TestDecodingColoredText()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeColoredText(game);
-            }
-        }
-
-        [Fact]
-        public void TestDecodingRubyText()
-        {
-            foreach (var game in GameSpecificData.SupportedGames)
-            {
-                DecodeRubyBaseMarker(game);
-                DecodeRubyTextStartMarker(game);
-                DecodeRubyTextEndMarker(game);
-            }
-        }
-
-        private void DecodeTextSegment(SC3Game game)
+        public void DecodeTextSegment()
         {
             string hex = "80C480C480C4";
-            var sc3String = SC3String.FromHexString(hex, game);
-
+            var sc3String = SC3String.FromHexString(hex, SC3Game.SteinsGateZero);
             Assert.Equal(1, sc3String.Segments.Length);
+
             var textSegment = sc3String.Segments[0] as TextSegment;
             Assert.NotNull(textSegment);
             Assert.Equal(SC3StringSegmentKind.Text, textSegment.SegmentKind);
             Assert.NotNull(textSegment.Value);
         }
 
-        private void DecodeLineBreak(SC3Game game)
+        [Fact]
+        public void DecodeLineBreakCommand()
         {
-            string hex = "00";
-            var sc3String = SC3String.FromHexString(hex, game);
-
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var textSegment = sc3String.Segments[0] as TextSegment;
-            Assert.NotNull(textSegment);
-            Assert.Equal("\n", textSegment.Value);
+            TestCommand("00", EmbeddedCommandKind.LineBreak);
         }
 
-        private void DecodeCharacterNameMarker(SC3Game game)
+        [Fact]
+        public void DecodeCharacterNameStartCommand()
         {
-            string hex = "01";
-            var sc3String = SC3String.FromHexString(hex, game);
-
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var marker = sc3String.Segments[0] as Marker;
-            Assert.NotNull(marker);
-            Assert.Equal(SC3StringSegmentKind.Marker, marker.SegmentKind);
-            Assert.Equal(MarkerKind.CharacterName, marker.MarkerKind);
+            TestCommand("01", EmbeddedCommandKind.CharacterNameStart);
         }
 
-        private void DecodeDialogueLineMarker(SC3Game game)
+        [Fact]
+        public void DecodeDialogueLineStartCommand()
         {
-            string hex = "02";
-            var sc3String = SC3String.FromHexString(hex, game);
-
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var marker = sc3String.Segments[0] as Marker;
-            Assert.NotNull(marker);
-            Assert.Equal(SC3StringSegmentKind.Marker, marker.SegmentKind);
-            Assert.Equal(MarkerKind.DialogueLine, marker.MarkerKind);
+            TestCommand("02", EmbeddedCommandKind.DialogueLineStart);
         }
 
-        private void DecodeRubyBaseMarker(SC3Game game)
+        [Fact]
+        public void DecodePresentCommand()
         {
-            string hex = "09";
-            var sc3String = SC3String.FromHexString(hex, game);
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var rubyBaseMarker = sc3String.Segments[0] as Marker;
-            Assert.NotNull(rubyBaseMarker);
-            Assert.Equal(SC3StringSegmentKind.Marker, rubyBaseMarker.SegmentKind);
-            Assert.Equal(MarkerKind.RubyBase, rubyBaseMarker.MarkerKind);
+            var command = TestCommand("03", EmbeddedCommandKind.Present) as PresentCommand;
+            Assert.Equal(PresentCommand.Action.None, command.AttachedAction);
         }
 
-        private void DecodeRubyTextStartMarker(SC3Game game)
+        [Fact]
+        public void DecodeSetColorCommand()
         {
-            string hex = "0A";
-            var sc3String = SC3String.FromHexString(hex, game);
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var rubyTextStartMarker = sc3String.Segments[0] as Marker;
-            Assert.NotNull(rubyTextStartMarker);
-            Assert.Equal(SC3StringSegmentKind.Marker, rubyTextStartMarker.SegmentKind);
-            Assert.Equal(MarkerKind.RubyTextStart, rubyTextStartMarker.MarkerKind);
+            var command = TestCommand("04820000", EmbeddedCommandKind.SetColor) as SetColorCommand;
+            Assert.NotNull(command.ColorIndex);
         }
 
-        private void DecodeRubyTextEndMarker(SC3Game game)
+        [Fact]
+        public void DecodePresentCommand_ResetAlignment()
         {
-            string hex = "0B";
-            var sc3String = SC3String.FromHexString(hex, game);
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var rubyTextEndMarker = sc3String.Segments[0] as Marker;
-            Assert.NotNull(rubyTextEndMarker);
-            Assert.Equal(SC3StringSegmentKind.Marker, rubyTextEndMarker.SegmentKind);
-            Assert.Equal(MarkerKind.RubyTextEnd, rubyTextEndMarker.MarkerKind);
+            var command = TestCommand("08", EmbeddedCommandKind.Present) as PresentCommand;
+            Assert.Equal(PresentCommand.Action.ResetTextAlignment, command.AttachedAction);
         }
 
-        private void DecodePresentCommand(SC3Game game)
+        [Fact]
+        public void DecodeRubyBaseStartCommand()
         {
-            var sc3String = SC3String.FromHexString("03FF", game);
+            TestCommand("09", EmbeddedCommandKind.RubyBaseStart);
+        }
+
+        [Fact]
+        public void DecodeRubyTextStartCommand()
+        {
+            TestCommand("0A", EmbeddedCommandKind.RubyTextStart);
+        }
+
+        [Fact]
+        public void DecodeRubyTextEndCommand()
+        {
+            TestCommand("0B", EmbeddedCommandKind.RubyTextEnd);
+        }
+
+        [Fact]
+        public void DecodeSetFontSizeCommand()
+        {
+            var command = TestCommand("0C0001", EmbeddedCommandKind.SetFontSize) as SetFontSizeCommand;
+            Assert.Equal(1, command.FontSize);
+        }
+
+        [Fact]
+        public void DecodePrintInParallelCommand()
+        {
+            TestCommand("0E", EmbeddedCommandKind.PrintInParallel);
+        }
+
+        [Fact]
+        public void DecodeCenterTextCommand()
+        {
+            TestCommand("0F", EmbeddedCommandKind.CenterText);
+        }
+
+        [Fact]
+        public void DecodeSetTopMarginCommand()
+        {
+            var command = TestCommand("110001", EmbeddedCommandKind.SetMargin) as SetMarginCommand;
+            Assert.True(command.TopMargin.HasValue);
+            Assert.False(command.LeftMargin.HasValue);
+
+            Assert.Equal(command.TopMargin, 1);
+        }
+
+        [Fact]
+        public void DecodeSetLeftMarginCommand()
+        {
+            var command = TestCommand("120001", EmbeddedCommandKind.SetMargin) as SetMarginCommand;
+            Assert.True(command.LeftMargin.HasValue);
+            Assert.False(command.TopMargin.HasValue);
+
+            Assert.Equal(command.LeftMargin, 1);
+        }
+
+        [Fact]
+        public void DecodeGetHardcodedValueCommand()
+        {
+            var command = TestCommand("130001", EmbeddedCommandKind.GetHardcodedValue) as GetHardcodedValueCommand;
+            Assert.Equal(1, command.Index);
+        }
+
+        [Fact]
+        public void DecodeAutoForwardCommand()
+        {
+            TestCommand("19", EmbeddedCommandKind.AutoForward);
+        }
+
+        private EmbeddedCommand TestCommand(string hex, EmbeddedCommandKind expectedCommandKind)
+        {
+            var sc3String = SC3String.FromHexString(hex, SC3Game.SteinsGateZero);
             Assert.Equal(1, sc3String.Segments.Length);
 
-            var command = sc3String.Segments[0] as PresentCommand;
+            var command = sc3String.Segments[0] as EmbeddedCommand;
             Assert.NotNull(command);
             Assert.Equal(SC3StringSegmentKind.EmbeddedCommand, command.SegmentKind);
-            Assert.Equal(EmbeddedCommandKind.Present, command.CommandKind);
-            Assert.Equal(false, command.ResetTextAlignment);
+            Assert.Equal(expectedCommandKind, command.CommandKind);
+
+            Compare(hex, sc3String.Encode(SC3Game.SteinsGateZero));
+
+            return command;
         }
 
-        private void DecodePresentCommand_ResetAlignment(SC3Game game)
+        private void Compare(string expectedHex, ImmutableArray<byte> actualBytes)
         {
-            var sc3String = SC3String.FromHexString("08FF", game);
-            Assert.Equal(1, sc3String.Segments.Length);
-
-            var command = sc3String.Segments[0] as PresentCommand;
-            Assert.NotNull(command);
-            Assert.Equal(SC3StringSegmentKind.EmbeddedCommand, command.SegmentKind);
-            Assert.Equal(EmbeddedCommandKind.Present, command.CommandKind);
-            Assert.Equal(true, command.ResetTextAlignment);
+            var expectedBytes = HexStrToBytes(expectedHex);
+            Assert.Equal(expectedBytes, actualBytes.ToArray());
         }
 
-        private void DecodeColoredText(SC3Game game)
+        private static byte[] HexStrToBytes(string hexString)
         {
-            string hex = "04 820000 809D80AB80A8803F809880B580AA80A480B180AC80BD80A480B780AC80B280B1";
-            var sc3String = SC3String.FromHexString(hex, game);
+            hexString = CleanHexString(hexString);
 
-            Assert.Equal(2, sc3String.Segments.Length);
+            return Enumerable.Range(0, hexString.Length / 2)
+                .Select(x => Convert.ToByte(hexString.Substring(x * 2, 2), 16))
+                .ToArray();
+        }
 
-            var setColorCommand = sc3String.Segments[0] as SetColorCommand;
-            var textSegment = sc3String.Segments[1] as TextSegment;
-
-            Assert.NotNull(setColorCommand);
-            Assert.NotNull(textSegment);
-
-            Assert.Equal(SC3StringSegmentKind.EmbeddedCommand, setColorCommand.SegmentKind);
-            Assert.Equal(EmbeddedCommandKind.SetColor, setColorCommand.CommandKind);
+        private static string CleanHexString(string hexString)
+        {
+            return hexString.Replace("0x", string.Empty).Replace(" ", string.Empty);
         }
     }
 }

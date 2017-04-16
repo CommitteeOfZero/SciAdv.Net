@@ -12,7 +12,9 @@ namespace SciAdvNet.SC3.Utils
         public override bool Equals(ImmutableArray<byte> x, ImmutableArray<byte> y)
         {
             if (x.Length != y.Length)
+            {
                 return false;
+            }
 
             return x.SequenceEqual(y);
         }

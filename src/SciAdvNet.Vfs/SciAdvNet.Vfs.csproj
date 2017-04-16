@@ -40,12 +40,23 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Criware\CpkFileEntry.cs" />
+    <Compile Include="Criware\CpkHeader.cs" />
+    <Compile Include="Criware\CpkTable.cs" />
+    <Compile Include="Criware\CpkTableEncryption.cs" />
+    <Compile Include="Criware\CpkTableEntry.cs" />
+    <Compile Include="Criware\CpkTableField.cs" />
+    <Compile Include="Criware\CpkTableFieldAttribute.cs" />
+    <Compile Include="Criware\CpkTableHeader.cs" />
+    <Compile Include="Criware\CriwareArchive.cs" />
     <Compile Include="IArchive.cs" />
     <Compile Include="ArchiveMode.cs" />
     <Compile Include="IFileEntry.cs" />
+    <Compile Include="Mages\MagesArchive.cs" />
+    <Compile Include="Mages\MpkFileEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SubReadStream.cs" />
-    <Compile Include="WrappedStream.cs" />
+    <Compile Include="Internal\SubReadStream.cs" />
+    <Compile Include="Internal\WrappedStream.cs" />
   </ItemGroup>
   <Import Project="..\SciAdvNet.Common\SciAdvNet.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

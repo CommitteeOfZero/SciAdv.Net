@@ -2,7 +2,12 @@
 {
     public enum SC3Game
     {
+        Unknown = 0,
         SteinsGateZero,
-        SteinsGateHD
+        SteinsGateHD,
+        SteinsGatePhenogram,
+        ElevenEyes,
+        ChaosChild,
+        RoboticsNotes
     }
 }

@@ -44,16 +44,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SteinsGateHDTests.cs" />
     <Compile Include="StringDecodingTests.cs" />
-    <Compile Include="StringDeserializationTests.cs" />
-    <Compile Include="StringEncodingTests.cs" />
+    <Compile Include="StringSerializationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Content Include="Data\SteinsGateHD.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="project.json" />
     <None Include="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

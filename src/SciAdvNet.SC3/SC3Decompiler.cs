@@ -12,111 +12,106 @@ namespace SciAdvNet.SC3
 
         private readonly bool _leaveOpen;
 
-        private SC3Decompiler(SC3Module module, bool leaveOpen)
+        private SC3Decompiler(SC3Script script, bool leaveOpen)
         {
-            Module = module;
+            Script = script;
             _leaveOpen = leaveOpen;
         }
 
-        public SC3Module Module { get; }
-
-        private Stream Stream => Module.ModuleStream;
-        private BinaryReader ModuleReader => Module.ModuleReader;
+        public SC3Script Script { get; }
+        private BinaryReader Reader => Script.Reader;
 
         private int Position
         {
-            get { return (int)Stream.Position; }
-            set { Stream.Position = value; }
+            get { return (int)Script.Stream.Position; }
+            set { Script.Stream.Position = value; }
         }
 
-        private ImmutableDictionary<ImmutableArray<byte>, InstructionStub> OpcodeTable =>
-            Module.GameSpecificData.OpcodeTable;
-
-        public static SC3Decompiler Open(SC3Module module, bool leaveOpen = false)
+        public static SC3Decompiler Open(SC3Script script, bool leaveOpen = false)
         {
-            if (module == null)
+            if (script == null)
             {
-                throw new ArgumentNullException(nameof(module));
+                throw new ArgumentNullException(nameof(script));
             }
 
-            return new SC3Decompiler(module, leaveOpen);
+            return new SC3Decompiler(script, leaveOpen);
         }
 
-        public static SC3Decompiler Load(Stream stream, bool leaveOpen = false)
+        public static SC3Decompiler Load(Stream stream, string fileName, SC3Game game, bool leaveOpen = false)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            var module = SC3Module.Load(stream, leaveOpen);
-            return new SC3Decompiler(module, leaveOpen);
+            var script = SC3Script.Load(stream, fileName, game, leaveOpen);
+            return new SC3Decompiler(script, leaveOpen);
         }
 
-        public static SC3Decompiler Load(string path)
+        public static SC3Decompiler Load(string path, SC3Game game)
         {
             if (string.IsNullOrEmpty(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            var module = SC3Module.Load(path);
-            return Open(module);
+            var script = SC3Script.Load(path, game);
+            return Open(script);
         }
 
-        public CodeBlock DecompileCodeBlock(CodeBlockDefinition blockDefinition)
+        public DecompilationResult DecompileCodeBlock(CodeBlockDefinition blockDefinition)
         {
             Position = blockDefinition.Offset;
-            var instrBuilder = ImmutableArray.CreateBuilder<Instruction>();
-            var refCollector = new ReferenceCollector(Module);
+            var instructions = ImmutableArray.CreateBuilder<Instruction>();
+            var refCollector = new ReferenceCollector(Script);
             ImmutableArray<byte> unrecognizedBytes = ImmutableArray<byte>.Empty;
             do
             {
-                Instruction currInstruction = null;
+                Instruction current = null;
                 try
                 {
-                    currInstruction = NextInstruction();
-                    if (currInstruction is EndOfScriptInstruction)
+                    current = NextInstruction();
+                    if (current is EndOfScriptInstruction)
                     {
                         break;
                     }
 
-                    if (instrBuilder.Count > 0)
+                    if (instructions.Count > 0)
                     {
-                        var last = instrBuilder[instrBuilder.Count - 1];
-                        currInstruction.Previous = last;
-                        last.Next = currInstruction;
+                        var last = instructions[instructions.Count - 1];
+                        current.Previous = last;
+                        last.Next = current;
                     }
                 }
                 catch (UnrecognizedInstructionException)
                 {
-                    unrecognizedBytes = ModuleReader.ReadBytes(blockDefinition.EndOffset - Position).ToImmutableArray();
+                    unrecognizedBytes = Reader.ReadBytes(blockDefinition.EndOffset - Position).ToImmutableArray();
                     break;
                 }
 
-                instrBuilder.Add(currInstruction);
-                refCollector.Visit(currInstruction);
+                instructions.Add(current);
+                //refCollector.Visit(current);
             } while (Position < blockDefinition.EndOffset);
 
-            return new CodeBlock(blockDefinition)
+            return new DecompilationResult(blockDefinition)
             {
-                Instructions = instrBuilder.ToImmutable(),
+                Instructions = instructions.ToImmutable(),
                 UnrecognizedBytes = unrecognizedBytes,
-                StringReferences = refCollector.Strings,
-                CodeBlockReferences = refCollector.CodeBlocks,
-                ExternalCodeBlockReferences = refCollector.ExternalCodeBlocks,
-                DataBlockReferences = refCollector.DataBlocks
+                StringReferences = refCollector.StringReferences,
+                CodeBlockReferences = refCollector.CodeBlockReferences,
+                ExternalCodeBlockReferences = refCollector.ExternalCodeBlockReferences,
+                DataBlockReferences = refCollector.DataBlockReferences
             };
         }
 
         private Instruction NextInstruction()
         {
-            InstructionStub instrStub = null;
-            int instrOffset = Position;
+            InstructionStub instructionStub = null;
+            int offset = Position;
 
-            instrStub = RecognizeInstruction();
+            instructionStub = RecognizeInstruction();
 
-            string typeName = $"{NamespaceName}.{instrStub.Name}{nameof(Instruction)}";
+            string typeName = $"{NamespaceName}.{instructionStub.Name}{nameof(Instruction)}";
             var type = Type.GetType(typeName);
             if (type == null)
             {
@@ -124,16 +119,16 @@ namespace SciAdvNet.SC3
             }
 
             var instruction = (Instruction)Activator.CreateInstance(type);
-            instruction.Name = instrStub.Name;
-            instruction.Opcode = instrStub.Opcode;
+            instruction.Name = instructionStub.Name;
+            instruction.Opcode = instructionStub.Opcode;
 
-            var operandBuilder = ImmutableArray.CreateBuilder<Operand>();
+            var operands = ImmutableArray.CreateBuilder<Operand>();
             var typeInfo = instruction.GetType().GetTypeInfo();
-            foreach (var operandStub in instrStub.OperandStubs)
+            foreach (var operandStub in instructionStub.OperandStubs)
             {
                 var operand = ReadOperand(operandStub);
                 operand.Name = operandStub.Name;
-                operandBuilder.Add(operand);
+                operands.Add(operand);
 
                 if (!(instruction is GenericInstruction))
                 {
@@ -145,34 +140,40 @@ namespace SciAdvNet.SC3
                 }
             }
 
-            instruction.Offset = instrOffset;
-            instruction.Length = Position - instrOffset;
-            instruction.Operands = operandBuilder.ToImmutable();
+            instruction.Offset = offset;
+            instruction.Length = Position - offset;
+
+            Reader.BaseStream.Position = offset;
+            var bytes = Reader.ReadBytes(instruction.Length);
+            instruction.Bytes = bytes.ToImmutableArray();
+            instruction.Operands = operands.ToImmutable();
             return instruction;
         }
 
         private InstructionStub RecognizeInstruction()
         {
-            InstructionStub instrStub = null;
+            var opcodeTable = Script.GameSpecificData.OpcodeTable;
+
+            InstructionStub stub = null;
             byte[] opcode;
             int opcodeLength = 1;
             do
             {
-                opcode = ModuleReader.PeekBytes(opcodeLength);
-                instrStub = OpcodeTable.GetValueOrDefault(opcode.ToImmutableArray());
-                if (instrStub == null)
+                opcode = Reader.PeekBytes(opcodeLength);
+                stub = opcodeTable.GetValueOrDefault(opcode.ToImmutableArray());
+                if (stub == null)
                 {
                     opcodeLength++;
                 }
-            } while (instrStub == null && opcodeLength <= 3);
+            } while (stub == null && opcodeLength <= 4);
 
-            if (instrStub == null)
+            if (stub == null)
             {
                 throw new UnrecognizedInstructionException();
             }
 
             Position += opcodeLength;
-            return instrStub;
+            return stub;
         }
 
         private Operand ReadOperand(OperandStub stub)
@@ -182,16 +183,16 @@ namespace SciAdvNet.SC3
                 return ReadPrimitiveTypeValue(stub.Type);
             }
 
-            return SC3ExpressionParser.ParseExpression(ModuleReader);
+            return SC3ExpressionParser.ParseExpression(Reader);
         }
 
         private PrimitiveTypeValue ReadPrimitiveTypeValue(OperandType type)
         {
             switch (type)
             {
-                case OperandType.Byte: return new PrimitiveTypeValue(ModuleReader.ReadByte(), type);
-                case OperandType.UInt16: return new PrimitiveTypeValue(ModuleReader.ReadUInt16(), type);
-                case OperandType.UInt32: return new PrimitiveTypeValue(ModuleReader.ReadUInt32(), type);
+                case OperandType.Byte: return new PrimitiveTypeValue(Reader.ReadByte(), type);
+                case OperandType.UInt16: return new PrimitiveTypeValue(Reader.ReadUInt16(), type);
+                case OperandType.UInt32: return new PrimitiveTypeValue(Reader.ReadUInt32(), type);
                 default: throw new ArgumentException(nameof(type));
             }
         }
@@ -200,7 +201,7 @@ namespace SciAdvNet.SC3
         {
             if (!_leaveOpen)
             {
-                Module.Dispose();
+                Script.Dispose();
             }
         }
     }

@@ -53,14 +53,6 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SciAdvNet.CriwareVfs\SciAdvNet.CriwareVfs.csproj">
-      <Project>{8115741a-a820-4943-bea2-e57edbf3689b}</Project>
-      <Name>SciAdvNet.CriwareVfs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SciAdvNet.MagesVfs\SciAdvNet.MagesVfs.csproj">
-      <Project>{679a414c-cb14-4a17-b90b-f9fc16db55e6}</Project>
-      <Name>SciAdvNet.MagesVfs</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\SciAdvNet.Vfs\SciAdvNet.Vfs.csproj">
       <Project>{57c40f3d-568e-4055-b1b2-534740324d32}</Project>
       <Name>SciAdvNet.Vfs</Name>

@@ -17,7 +17,7 @@ namespace SciAdvNet.SC3
         private const string OpcodeAttributeName = "Opcode";
 
         private static XNamespace RootNamespace = "http://schemas.sciadv.net/sc3/instructionstubs";
-        private static readonly Dictionary<string, OperandType> OperandTypeMap = new Dictionary<string, OperandType>()
+        private static readonly Dictionary<string, OperandType> s_operandTypeMap = new Dictionary<string, OperandType>()
         {
             ["expression"] = OperandType.Expression,
             ["expr"] = OperandType.Expression,
@@ -29,9 +29,9 @@ namespace SciAdvNet.SC3
         };
 
 
-        public static ImmutableDictionary<ImmutableArray<byte>, InstructionStub> Parse(Stream xmlFile)
+        public static ImmutableDictionary<ImmutableArray<byte>, InstructionStub> Parse(Stream stream)
         {
-            var doc = XDocument.Load(xmlFile);
+            var doc = XDocument.Load(stream);
             var instructionStubElements = doc.Root.Elements(RootNamespace + InstructionStubElementName);
             return instructionStubElements.Select(ParseInstructionStubElement)
                 .ToImmutableDictionary(x => x.Opcode, x => x, ByteArrayComparer.Instance);
@@ -64,7 +64,7 @@ namespace SciAdvNet.SC3
 
                 string strOperandType = parts[0];
                 string operandName = parts[1];
-                var operandType = OperandTypeMap[strOperandType.ToLowerInvariant()];
+                var operandType = s_operandTypeMap[strOperandType.ToLowerInvariant()];
                 result.Add(new OperandStub(operandName, operandType));
             }
 

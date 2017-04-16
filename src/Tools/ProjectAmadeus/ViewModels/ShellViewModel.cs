@@ -1,42 +1,67 @@
 ﻿using Caliburn.Micro;
+using Newtonsoft.Json;
+using ProjectAmadeus.Messages;
+using ProjectAmadeus.Models;
 using ProjectAmadeus.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
-using System.Text;
-using System.Windows;
 
 namespace ProjectAmadeus.ViewModels
 {
-    public sealed class ShellViewModel : Conductor<ITab>.Collection.OneActive
+    public sealed class ShellViewModel : Conductor<ITab>.Collection.OneActive, IHandle<OpenFontEditorCommand>
     {
-        private const string ScriptExtensions = "*.scx;*.scr";
-        private const string FileTypeDescription = "SciADV game script";
-
-        private readonly Func<ITab> _tabFactory;
+        private readonly Func<DocumentViewModel> _documentFactory;
+        private readonly Func<FontEditorViewModel> _fontEditorFactory;
+        private readonly SharedData _sharedData;
         private readonly IFilePicker _filePicker;
+        private readonly IEventAggregator _eventAggregator;
+
+        private readonly FileDialogFilter GameScriptFilter;
 
         public ShellViewModel()
         {
         }
 
-        public ShellViewModel(Func<ITab> tabFactory, IFilePicker filePicker)
+        public ShellViewModel(NotificationAreaViewModel notificationArea, Func<DocumentViewModel> documentFactory,
+            Func<FontEditorViewModel> fontEditorFactory, SharedData sharedData, IFilePicker filePicker, IEventAggregator eventAggregator)
         {
-            _tabFactory = tabFactory;
+            NotificationArea = notificationArea;
+            _documentFactory = documentFactory;
+            _fontEditorFactory = fontEditorFactory;
+            _sharedData = sharedData;
             _filePicker = filePicker;
+            _eventAggregator = eventAggregator;
 
             DisplayName = "Project Amadeus";
+            GameScriptFilter = new FileDialogFilter("SciADV game scripts", new[] { ".scx", ".scr" });
+            CloseStrategy = new AmadeusCloseStrategy();
+
+            _eventAggregator.Subscribe(this);
         }
 
+        public NotificationAreaViewModel NotificationArea { get; }
         public bool CanCloseFile => ActiveItem != null;
 
-        public void OpenFile()
+        protected override void OnInitialize()
         {
-            string path = _filePicker.PickOpen(ScriptExtensions, FileTypeDescription);
+            base.OnInitialize();
+            LoadLanguages();
+        }
+
+        private void LoadLanguages()
+        {
+            string json = File.ReadAllText("Data/languages.json");
+            _sharedData.Languages = JsonConvert.DeserializeObject<ImmutableArray<Language>>(json);
+        }
+
+        public void Browse()
+        {
+            string path = _filePicker.PickOpen(GameScriptFilter);
             if (!string.IsNullOrEmpty(path))
             {
-                var tab = CreateTab(path);
-                ActivateItem(tab);
+                OpenFile(path);
                 NotifyOfPropertyChange(nameof(CanCloseFile));
             }
         }
@@ -45,57 +70,56 @@ namespace ProjectAmadeus.ViewModels
         {
             foreach (string path in files)
             {
-                var tab = CreateTab(path);
-                if (ActiveItem == null)
-                {
-                    ActivateItem(tab);
-                }
+                OpenFile(path);
             }
         }
 
-        public void SaveAs()
+        private void OpenFile(string path)
         {
-            string path = _filePicker.PickSave("*.txt", "Text files");
-            if (!string.IsNullOrEmpty(path))
+            var documentTab = _documentFactory();
+            documentTab.FilePath = path;
+            NewTab(documentTab);
+        }
+
+        private void NewTab(ITab tab, bool activate = true)
+        {
+            Items.Add(tab);
+            if (activate)
             {
-                var sb = new StringBuilder();
-
-                var active = ActiveItem;
-                active.Module.ApplyPendingUpdates();
-
-                foreach (var stringHandle in active.Module.StringTable)
-                {
-                    sb.Append($"[{stringHandle.Id}]");
-                    sb.Append(stringHandle.Resolve().ToString(normalize: true));
-                    sb.AppendLine();
-                }
-
-                File.WriteAllText(path, sb.ToString());
+                ActivateItem(tab);
             }
         }
 
+        public void SaveChanges()
+        {
+            var doc = ActiveItem as IDocumentTab;
+            if (doc != null)
+            {
+                doc.SaveChanges();
+            }
+        }
+
+        public void CloseFile() => CloseTab(ActiveItem);
         public void CloseTab(ITab tab)
         {
-            DeactivateItem(tab, true);
+            DeactivateItem(ActiveItem, close: true);
             NotifyOfPropertyChange(nameof(CanCloseFile));
-        }
-
-        public void CloseFile()
-        {
-            CloseTab(ActiveItem);
         }
 
         public void Exit()
         {
-            Application.Current.Shutdown();
+            TryClose();
         }
 
-        private ITab CreateTab(string path)
+        public void ShowFontEditor(string userCharacters)
         {
-            var newTab = _tabFactory();
-            newTab.FilePath = path;
-            Items.Add(newTab);
-            return newTab;
+            var editor = _fontEditorFactory();
+            NewTab(editor);
+        }
+
+        public void Handle(OpenFontEditorCommand command)
+        {
+            ShowFontEditor(command.UserCharacters);
         }
     }
 }

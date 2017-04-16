@@ -2,7 +2,7 @@
 {
     public class CodeWalker : CodeVisitor
     {
-        public override void VisitCodeBlock(CodeBlock codeBlock)
+        public override void VisitCodeBlock(DecompilationResult codeBlock)
         {
             foreach (var instruction in codeBlock.Instructions)
             {

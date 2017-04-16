@@ -12,6 +12,7 @@ namespace SciAdvNet.SC3
         public string Name { get; internal set; }
         public int Offset { get; internal set; }
         public int Length { get; internal set; }
+        public ImmutableArray<byte> Bytes { get; internal set; }
         public ImmutableArray<byte> Opcode { get; internal set; }
         public ImmutableArray<Operand> Operands { get; internal set; }
 

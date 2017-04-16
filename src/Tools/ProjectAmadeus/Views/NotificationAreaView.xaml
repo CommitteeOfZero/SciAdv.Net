@@ -1,0 +1,120 @@
+﻿<UserControl x:Class="ProjectAmadeus.Views.NotificationAreaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:ProjectAmadeus.ViewModels"
+             xmlns:cm="http://www.caliburnproject.org"
+             xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:controls="clr-namespace:ProjectAmadeus.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="300" FontSize="18"
+             d:DataContext="{d:DesignInstance Type=vm:NotificationAreaViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Styles.xaml" />
+                <ResourceDictionary Source="/AmadeusStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+ 
+    <metro:Flyout IsOpen="{Binding IsVisible, Mode=OneWay}" Position="Top"
+                  AnimateOpacity="True" HorizontalAlignment="Center" MaxWidth="600" Background="Transparent"
+                  CloseButtonVisibility="Collapsed" TitleVisibility="Collapsed" Margin="0,-15,0,0">
+        <Grid Margin="0,30,0,0">
+            <Border Background="#333333">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="2" BlurRadius="8" />
+                </Border.Effect>
+            </Border>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Border VerticalAlignment="Center" Margin="10,0">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="Info">
+                                    <Setter Property="Background" Value="#007ACC" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="Error">
+                                    <Setter Property="Background" Value="Red" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="UserPrompt">
+                                    <Setter Property="Background" Value="Green" />
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <TextBlock FontSize="16" Margin="5">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="Info">
+                                        <Setter Property="Text" Value="Info" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="Error">
+                                        <Setter Property="Text" Value="Error" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="UserPrompt">
+                                        <Setter Property="Text" Value="   " />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Border>
+
+                <Grid Grid.Column="1" VerticalAlignment="Center" Margin="5,10">
+                    <StackPanel>
+                        <ContentControl cm:View.Model="{Binding CurrentNotification}" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="UserPrompt">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                            <Button x:Name="Confirm" Content="{Binding CurrentNotification.ConfirmText}" Width="70"
+                                    Background="{StaticResource HighlightBrush}" IsDefault="True" />
+                            
+                            <Button x:Name="Cancel" Content="{Binding CurrentNotification.CancelText}" Width="70" Margin="10,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <Button x:Name="DismissNotification" Grid.Column="2" Content="Close" Background="{StaticResource HighlightBrush}"
+                        Cursor="Hand" IsDefault="True" Width="60" FontSize="16" Margin="0,0.5">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentNotification.Kind}" Value="UserPrompt">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Grid>
+    </metro:Flyout>
+</UserControl>

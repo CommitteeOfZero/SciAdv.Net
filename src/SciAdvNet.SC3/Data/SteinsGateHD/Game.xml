@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Game FriendlyName="Steins;Gate HD">
+  <KnownScripts>SG\d\d.*.scx</KnownScripts>
+  <ReservedCharacterRange Start="E12F" End="E2AF" />
+</Game>

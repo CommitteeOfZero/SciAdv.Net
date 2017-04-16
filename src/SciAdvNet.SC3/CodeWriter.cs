@@ -1,7 +1,5 @@
-﻿using SciAdvNet.SC3.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace SciAdvNet.SC3
 {
@@ -130,6 +128,6 @@ namespace SciAdvNet.SC3
             }
         }
 
-        public abstract void WriteCodeBlock(CodeBlock codeBlock);
+        public abstract void WriteCodeBlock(DecompilationResult codeBlock);
     }
 }

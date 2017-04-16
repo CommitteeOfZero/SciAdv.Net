@@ -1,7 +1,8 @@
 ﻿using SciAdvNet.Common;
+using System;
 using System.Collections.Immutable;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SciAdvNet.SC3.Text
@@ -28,25 +29,24 @@ namespace SciAdvNet.SC3.Text
                 byte actualByte = Reader.PeekByte();
                 if (actualByte != expectedMarker)
                 {
-                    throw ExceptionUtils.SC3String_UnexpectedByte(actualByte);
+                    throw DecodingFailed(unexpectedByte: actualByte);
                 }
 
                 Advance();
             }
         }
 
-        private readonly GameSpecificData _data;
-
-        public SC3StringDecoder(SC3Game game)
+        public SC3StringDecoder(SC3Game game, string userCharacters = "")
         {
-            _data = GameSpecificData.For(game);
+            CharacterSet = new CharacterSet(game, userCharacters);
         }
 
-        private string Charset => _data.CharacterSet;
-        private ImmutableDictionary<int, string> PrivateUseCharacters => _data.PrivateUseCharacters;
-        
-        private static bool IsCharacter(byte b) => b >= 0x80 || b == StringSegmentCodes.LineBreak;
+        public CharacterSet CharacterSet { get; }
 
+        private static bool IsCharacter(byte b) => b >= 0x80 || b == EmbeddedCommands.LineBreak;
+
+
+        public SC3String DecodeString(ImmutableArray<byte> bytes) => DecodeString(bytes.ToArray());
         public SC3String DecodeString(byte[] bytes)
         {
             using (var stream = new MemoryStream(bytes))
@@ -55,18 +55,19 @@ namespace SciAdvNet.SC3.Text
                 var scanner = new Scanner(reader);
                 var segments = ImmutableArray.CreateBuilder<SC3StringSegment>();
                 byte peek;
-                while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != StringSegmentCodes.StringTerminator)
+                while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != EmbeddedCommands.StringTerminator)
                 {
                     var seg = NextSegment(scanner);
                     segments.Add(seg);
                 }
 
-                if (!scanner.ReachedEnd)
+                bool isPropertyTerminated = !scanner.ReachedEnd;
+                if (isPropertyTerminated)
                 {
-                    scanner.EatMarker(StringSegmentCodes.StringTerminator);
+                    scanner.EatMarker(EmbeddedCommands.StringTerminator);
                 }
 
-                return new SC3String(segments.ToImmutable());
+                return new SC3String(segments.ToImmutable(), isPropertyTerminated);
             }
         }
 
@@ -75,62 +76,93 @@ namespace SciAdvNet.SC3.Text
             byte peek = scanner.PeekByte();
             switch (peek)
             {
-                case StringSegmentCodes.CharacterName:
+                case 0x1E:
                     scanner.Advance();
-                    return new Marker(MarkerKind.CharacterName);
-
-                case StringSegmentCodes.DialogueLine:
                     scanner.Advance();
-                    return new Marker(MarkerKind.DialogueLine);
-
-                case StringSegmentCodes.RubyBase:
                     scanner.Advance();
-                    return new Marker(MarkerKind.RubyBase);
+                    return new LineBreakCommand();
 
-                case StringSegmentCodes.RubyTextStart:
+                case 0x1F:
                     scanner.Advance();
-                    return new Marker(MarkerKind.RubyTextStart);
+                    return new LineBreakCommand();
 
-                case StringSegmentCodes.RubyTextEnd:
+                case EmbeddedCommands.LineBreak:
                     scanner.Advance();
-                    return new Marker(MarkerKind.RubyTextEnd);
+                    return new LineBreakCommand();
 
-                case StringSegmentCodes.SetColor:
+                case EmbeddedCommands.CharacterNameStart:
+                    scanner.Advance();
+                    return new CharacterNameStartCommand();
+
+                case EmbeddedCommands.DialogueLineStart:
+                    scanner.Advance();
+                    return new DialogueLineStartCommand();
+
+                case EmbeddedCommands.Present:
+                    scanner.Advance();
+                    return new PresentCommand(PresentCommand.Action.None);
+
+                case EmbeddedCommands.SetColor:
                     scanner.Advance();
                     var colorIndex = SC3ExpressionParser.ParseExpression(scanner.Reader);
                     return new SetColorCommand(colorIndex);
 
-                case StringSegmentCodes.SetFontSize:
+                case EmbeddedCommands.Present_ResetAlignment:
                     scanner.Advance();
-                    int fontSize = scanner.Reader.ReadInt16();
+                    return new PresentCommand(PresentCommand.Action.ResetTextAlignment);
+
+                case EmbeddedCommands.RubyBaseStart:
+                    scanner.Advance();
+                    return new RubyBaseStartCommand();
+
+                case EmbeddedCommands.RubyTextStart:
+                    scanner.Advance();
+                    return new RubyTextStartCommand();
+
+                case EmbeddedCommands.RubyTextEnd:
+                    scanner.Advance();
+                    return new RubyTextEndCommand();
+
+                case EmbeddedCommands.SetFontSize:
+                    scanner.Advance();
+                    int fontSize = scanner.Reader.ReadInt16BE();
                     return new SetFontSizeCommand(fontSize);
 
-                case StringSegmentCodes.SetAlignment_Center:
+                case EmbeddedCommands.PrintInParallel:
+                    scanner.Advance();
+                    return new PrintInParallelCommand();
+
+                case EmbeddedCommands.CenterText:
                     scanner.Advance();
                     return new CenterTextCommand();
 
-                case StringSegmentCodes.SetTopMargin:
+                case EmbeddedCommands.SetTopMargin:
                     scanner.Advance();
-                    int topMargin = scanner.Reader.ReadInt16();
+                    short topMargin = scanner.Reader.ReadInt16BE();
                     return new SetMarginCommand(null, topMargin);
 
-                case StringSegmentCodes.SetLeftMargin:
+                case EmbeddedCommands.SetLeftMargin:
                     scanner.Advance();
-                    int leftMargin = scanner.Reader.ReadInt16();
+                    short leftMargin = scanner.Reader.ReadInt16BE();
                     return new SetMarginCommand(leftMargin, null);
 
-                case StringSegmentCodes.EvaluateExpression:
+                case EmbeddedCommands.GetHardcodedValue:
+                    scanner.Advance();
+                    short index = scanner.Reader.ReadInt16BE();
+                    return new GetHardcodedValueCommand(index);
+
+                case EmbeddedCommands.EvaluateExpression:
                     scanner.Advance();
                     var expression = SC3ExpressionParser.ParseExpression(scanner.Reader);
                     return new EvaluateExpressionCommand(expression);
 
-                case StringSegmentCodes.Present:
+                case EmbeddedCommands.AutoForward:
                     scanner.Advance();
-                    return new PresentCommand(resetTextAlignment: false);
+                    return new AutoForwardCommand();
 
-                case StringSegmentCodes.Present_ResetAlignment:
+                case EmbeddedCommands.Present_0x18:
                     scanner.Advance();
-                    return new PresentCommand(resetTextAlignment: true);
+                    return new PresentCommand(PresentCommand.Action.Unknown_0x18);
 
                 default:
                     peek = scanner.PeekByte();
@@ -141,7 +173,7 @@ namespace SciAdvNet.SC3.Text
                     }
                     else
                     {
-                        throw ExceptionUtils.SC3String_UnexpectedByte(peek);
+                        throw DecodingFailed(unexpectedByte: peek);
                     }
             }
         }
@@ -150,16 +182,11 @@ namespace SciAdvNet.SC3.Text
         {
             var sb = new StringBuilder();
             byte peek;
-            while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != StringSegmentCodes.StringTerminator)
+            while (!scanner.ReachedEnd && (peek = scanner.PeekByte()) != EmbeddedCommands.StringTerminator)
             {
                 if (peek >= 0x80)
                 {
                     NextCharacter(scanner, sb);
-                }
-                else if (peek == StringSegmentCodes.LineBreak)
-                {
-                    scanner.Advance();
-                    sb.Append("\n");
                 }
                 else
                 {
@@ -172,17 +199,36 @@ namespace SciAdvNet.SC3.Text
 
         private void NextCharacter(Scanner scanner, StringBuilder sb)
         {
-            int index = ((scanner.Reader.ReadByte() & 0x7F) * 256) + scanner.Reader.ReadByte();
-            char c = Charset[index];
-            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.PrivateUse)
+            ushort code = scanner.Reader.ReadUInt16BE();
+            char character = char.MaxValue;
+            try
             {
-                sb.Append(c);
+                character = CharacterSet.DecodeCharacter(code);
+                if (character != char.MaxValue)
+                {
+                    sb.Append(character);
+                }
+                else
+                {
+                    string compoundCharacter = CharacterSet.DecodeCompoundCharacter(code);
+                    sb.Append($"[{compoundCharacter}]");
+                }
             }
-            else
+            catch (ArgumentException ex)
             {
-                int codePoint = c;
-                sb.Append($"[{PrivateUseCharacters[codePoint]}]");
+                throw DecodingFailed(ex.Message);
             }
+        }
+
+        private static Exception DecodingFailed(string reason)
+        {
+            string message = $"String decoding failed. {reason}";
+            return new StringDecodingFailedException(message);
+        }
+
+        public static Exception DecodingFailed(byte unexpectedByte)
+        {
+            return DecodingFailed($"Unexpected byte: 0x{unexpectedByte:X2}");
         }
     }
 }

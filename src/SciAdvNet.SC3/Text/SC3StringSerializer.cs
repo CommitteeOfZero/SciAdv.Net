@@ -6,5 +6,6 @@
     public abstract class SC3StringSerializer
     {
         public abstract string Serialize(SC3String sc3String);
+        public abstract string SerializeSegment(SC3StringSegment segment);
     }
 }

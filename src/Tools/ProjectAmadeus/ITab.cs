@@ -1,10 +1,8 @@
-﻿using SciAdvNet.SC3;
+﻿using Caliburn.Micro;
 
 namespace ProjectAmadeus
 {
-    public interface ITab
+    public interface ITab : IScreen
     {
-        string FilePath { get; set; }
-        SC3Module Module { get; }
     }
 }

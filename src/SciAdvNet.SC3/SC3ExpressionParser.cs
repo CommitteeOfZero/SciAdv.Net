@@ -1,6 +1,5 @@
 ﻿using SciAdvNet.Common;
 using SciAdvNet.SC3.Utils;
-using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -151,34 +150,28 @@ namespace SciAdvNet.SC3
             byte code = reader.ReadByte();
             precedence = reader.ReadByte();
 
-            Func<byte, bool> isPrefixUnaryOperator = x => Enum.IsDefined(typeof(PrefixUnaryOperatorKind), x);
-            Func<byte, bool> isPostfixUnaryOperator = x => Enum.IsDefined(typeof(PostfixUnaryOperatorKind), x);
-            Func<byte, bool> isBinaryOperator = x => Enum.IsDefined(typeof(BinaryOperatorKind), x);
-            Func<byte, bool> isAssignmentOperator = x => Enum.IsDefined(typeof(AssignmentOperatorKind), x);
-            Func<byte, bool> isSpecialOperator = x => Enum.IsDefined(typeof(SpecialOperatorKind), x);
-
-            if (isPrefixUnaryOperator(code))
+            if (IsPrefixUnary(code))
             {
                 return new PrefixUnaryOperatorToken((PrefixUnaryOperatorKind)code, precedence);
             }
-            if (isPostfixUnaryOperator(code))
+            if (IsPostfixUnary(code))
             {
                 return new PostfixUnaryOperatorToken((PostfixUnaryOperatorKind)code, precedence);
             }
-            if (isBinaryOperator(code))
+            if (IsBinary(code))
             {
                 return new BinaryOperatorToken((BinaryOperatorKind)code, precedence);
             }
-            if (isAssignmentOperator(code))
+            if (IsAssignment(code))
             {
                 return new AssignmentOperatorToken((AssignmentOperatorKind)code, precedence);
             }
-            if (isSpecialOperator(code))
+            if (IsSpecialOperator(code))
             {
                 return new SpecialOperatorToken((SpecialOperatorKind)code, precedence);
             }
 
-            throw new InvalidOperationException($"0x{code:X2}{precedence:X2} is not a valid expression token.");
+            throw new InvalidDataException($"0x{code:X2}{precedence:X2} is not a valid expression token.");
         }
 
         private static ExpressionToken PeekExpressionToken(BinaryReader reader)
@@ -193,6 +186,90 @@ namespace SciAdvNet.SC3
             reader.BaseStream.Position += token.Length;
         }
 
+        private static bool IsPrefixUnary(byte op)
+        {
+            return (PrefixUnaryOperatorKind)op == PrefixUnaryOperatorKind.BitwiseNegation;
+        }
+
+        private static bool IsPostfixUnary(byte op)
+        {
+            switch ((PostfixUnaryOperatorKind)op)
+            {
+                case PostfixUnaryOperatorKind.PostfixDecrement:
+                case PostfixUnaryOperatorKind.PostfixIncrement:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsBinary(byte op)
+        {
+            switch ((BinaryOperatorKind)op)
+            {
+                case BinaryOperatorKind.Addition:
+                case BinaryOperatorKind.BitwiseAnd:
+                case BinaryOperatorKind.BitwiseOr:
+                case BinaryOperatorKind.BitwiseXor:
+                case BinaryOperatorKind.Division:
+                case BinaryOperatorKind.Equal:
+                case BinaryOperatorKind.GreaterThan:
+                case BinaryOperatorKind.GreaterThanOrEqual:
+                case BinaryOperatorKind.LeftShift:
+                case BinaryOperatorKind.LessThan:
+                case BinaryOperatorKind.LessThanOrEqual:
+                case BinaryOperatorKind.Modulo:
+                case BinaryOperatorKind.Multiplication:
+                case BinaryOperatorKind.NotEqual:
+                case BinaryOperatorKind.RightShift:
+                case BinaryOperatorKind.Subtraction:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsAssignment(byte op)
+        {
+            switch ((AssignmentOperatorKind)op)
+            {
+                case AssignmentOperatorKind.AddAssignment:
+                case AssignmentOperatorKind.AndAssignment:
+                case AssignmentOperatorKind.DivideAssignment:
+                case AssignmentOperatorKind.ExclusiveOrAssignment:
+                case AssignmentOperatorKind.LeftShiftAssignment:
+                case AssignmentOperatorKind.ModuloAssignment:
+                case AssignmentOperatorKind.MultiplyAssignment:
+                case AssignmentOperatorKind.OrAssignment:
+                case AssignmentOperatorKind.RightShiftAssignment:
+                case AssignmentOperatorKind.SimpleAssignment:
+                case AssignmentOperatorKind.SubtractAssignment:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool IsSpecialOperator(byte op)
+        {
+            switch ((SpecialOperatorKind)op)
+            {
+                case SpecialOperatorKind.DataBlockAccess:
+                case SpecialOperatorKind.DataBlockReference:
+                case SpecialOperatorKind.Flag:
+                case SpecialOperatorKind.GlobalVar:
+                case SpecialOperatorKind.RandomNumber:
+                case SpecialOperatorKind.ThreadLocalVar:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private static int ReadConstant(BinaryReader reader)
         {
             byte firstByte = reader.ReadByte();
@@ -205,9 +282,9 @@ namespace SciAdvNet.SC3
             bool positive = IsPositiveConstant(firstByte);
             firstByte = positive ? firstByte &= PositiveConstantValueMask : firstByte |= NegativeConstantValueMask;
 
+            // TODO: make this more clear, get rid of the LINQ magic.
             var constBytes = new[] { firstByte }.Concat(reader.ReadBytes(length - 1).Reverse()).ToArray();
-            constBytes = Enumerable.Repeat((byte)(positive ? 0x00 : 0xFF), 4 - constBytes.Length)
-                .Concat(constBytes).ToArray();
+            constBytes = Enumerable.Repeat((byte)(positive ? 0x00 : 0xFF), 4 - constBytes.Length).Concat(constBytes).ToArray();
 
             return BinaryUtils.BytesToInt32(constBytes, ByteOrder.BigEndian);
         }

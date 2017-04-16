@@ -6,7 +6,7 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <OutputPath>$(OutputRoot)</OutputPath>
+    <OutputPath>$(OutputRoot)\</OutputPath>
     <AllowedReferenceRelatedFileExtensions>None</AllowedReferenceRelatedFileExtensions>
   </PropertyGroup>
 
@@ -17,8 +17,8 @@
     <ReleasesDir>$(SolutionDir)\releases\</ReleasesDir>
     <BuildDir>$(SolutionDir)\build\</BuildDir>
     <MSBuildTasksPath>$(BuildDir)\MSBuild Tasks\</MSBuildTasksPath>
-    <OutputRoot>$(BinDir)\$(Configuration)</OutputRoot>
-    <BaseIntermediateOutputPath>$(SolutionDir)\obj</BaseIntermediateOutputPath>
+    <OutputRoot>$(BinDir)\$(Configuration)\</OutputRoot>
+    <BaseIntermediateOutputPath>$(SolutionDir)\obj\</BaseIntermediateOutputPath>
     <ZipPackageName>SciAdv.NET</ZipPackageName>
   </PropertyGroup>
 

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<InstructionStubs xmlns="http://schemas.sciadv.net/sc3/instructionstubs"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://schemas.sciadv.net/sc3/instructionstubs ../../Schemas/InstructionStubs.xsd">
+  <InstructionStub Name="UNK_RandomMailEnd" Opcode="1037">
+    byte unk
+  </InstructionStub>
+
+  <InstructionStub Name="UNK_SetBgCutin" Opcode="102A00">
+    expr unkExpr, expr buf1, expr buf2
+  </InstructionStub>
+
+  <InstructionStub Name="EffectWaveInit" Opcode="10300A" />
+
+  <InstructionStub Name="EffectWaveSet" Opcode="10300B">
+    expr a1, expr a2, expr a3, expr a4, expr a5
+  </InstructionStub>
+</InstructionStubs>

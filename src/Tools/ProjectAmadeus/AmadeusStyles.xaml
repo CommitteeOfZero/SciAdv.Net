@@ -6,14 +6,8 @@
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/VS/Styles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="HyperlinkButton" TargetType="Button">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <ContentPresenter/>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Foreground}" />
     </Style>
 
     <Style x:Key="VSTabControlStyle" TargetType="TabControl" BasedOn="{StaticResource {x:Type TabControl}}">

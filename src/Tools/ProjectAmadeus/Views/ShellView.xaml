@@ -3,8 +3,10 @@
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                    xmlns:cm="http://www.caliburnproject.org"
                    xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                   xmlns:local="clr-namespace:ProjectAmadeus"
                    xmlns:vm="clr-namespace:ProjectAmadeus.ViewModels"
                    mc:Ignorable="d"
                    d:DataContext="{d:DesignInstance Type=vm:ShellViewModel, IsDesignTimeCreatable=True}"
@@ -21,29 +23,61 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Background="{StaticResource LightBackground}">
-        <DockPanel>
-            <Menu DockPanel.Dock="Top" IsMainMenu="True" FontSize="16">
-                <MenuItem Header="File">
-                    <MenuItem x:Name="OpenFile" Header="Open File..." />
-                    <MenuItem x:Name="SaveAs" Header="Save As..." />
-                    <MenuItem x:Name="CloseFile" Header="Close File" />
-                    <Separator />
-                    <MenuItem x:Name="Exit" Header="Exit" />
-                </MenuItem>
+    <i:Interaction.Triggers>
+        <local:InputBindingTrigger>
+            <local:InputBindingTrigger.InputBinding>
+                <KeyBinding Modifiers="Ctrl" Key="O" />
+            </local:InputBindingTrigger.InputBinding>
 
-                <MenuItem Header="View">
+            <cm:ActionMessage MethodName="Browse" />
+        </local:InputBindingTrigger>
 
-                </MenuItem>
+        <local:InputBindingTrigger>
+            <local:InputBindingTrigger.InputBinding>
+                <KeyBinding Modifiers="Ctrl" Key="S" />
+            </local:InputBindingTrigger.InputBinding>
 
-                <MenuItem Header="?" />
-            </Menu>
+            <cm:ActionMessage MethodName="SaveChanges" />
+        </local:InputBindingTrigger>
+    </i:Interaction.Triggers>
 
-            <Grid>
+    <DockPanel Background="{StaticResource LightBackground}">
+        <Menu DockPanel.Dock="Top" IsMainMenu="True" FontSize="16">
+            <MenuItem Header="File">
+                <MenuItem x:Name="Browse" Header="_Open" InputGestureText="Ctrl+O" />
+                <MenuItem x:Name="SaveChanges" Header="_Save" InputGestureText="Ctrl+S" />
+                <MenuItem x:Name="CloseFile" Header="Close" />
+                <Separator />
+                <MenuItem x:Name="Exit" Header="Exit" />
+            </MenuItem>
+
+            <MenuItem Header="View">
+                <!--<MenuItem x:Name="ShowFontEditor" Header="Game Font Editor" />-->
+            </MenuItem>
+
+            <MenuItem Header="?" />
+        </Menu>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid x:Name="MainRegion">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding NotificationArea.IsVisible}" Value="True">
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <BlurEffect />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+
                 <ContentControl>
                     <TextBlock FontSize="22" TextAlignment="Center" Foreground="{StaticResource Foreground}"
                                VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Button cm:Message.Attach="OpenFile" Style="{StaticResource HyperlinkButton}">
+                        <Button cm:Message.Attach="Browse" Style="{StaticResource LinkButton}">
                             <Hyperlink>Open File</Hyperlink>
                         </Button>
                         <LineBreak />
@@ -62,7 +96,13 @@
                     </ContentControl.Style>
                 </ContentControl>
 
-                <TabControl x:Name="Items" Margin="5,5,0,0">
+                <TabControl x:Name="Items" FontSize="14" Margin="6,5,0,0">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}" ToolTip="{Binding FilePath}" />
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+                    
                     <TabControl.Style>
                         <Style TargetType="TabControl" BasedOn="{StaticResource VSTabControlStyle}">
                             <Style.Triggers>
@@ -72,8 +112,11 @@
                             </Style.Triggers>
                         </Style>
                     </TabControl.Style>
+                    
                 </TabControl>
             </Grid>
-        </DockPanel>
-    </Grid>
+
+            <ContentControl cm:View.Model="{Binding NotificationArea}" VerticalAlignment="Top" />
+        </Grid>
+    </DockPanel>
 </metro:MetroWindow>

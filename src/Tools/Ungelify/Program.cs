@@ -257,8 +257,8 @@ namespace Ungelify
 
         private void DisplayHelp()
         {
-            Console.WriteLine("cd <path>");
             Console.WriteLine("Commands:");
+            Console.WriteLine("cd <path>");
             Console.WriteLine("open <filename>");
             Console.WriteLine("ls OR list-contents");
             Console.WriteLine("extract all OR extract <filename> OR extract <id> (use 'open' first)");

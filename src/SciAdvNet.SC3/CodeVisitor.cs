@@ -7,7 +7,7 @@
             visitable?.Accept(this);
         }
 
-        public virtual void VisitCodeBlock(CodeBlock codeBlock) { }
+        public virtual void VisitCodeBlock(DecompilationResult codeBlock) { }
         public virtual void DefaultVisitInstruction(Instruction instruction) { }
 
         public virtual void VisitAssignInstruction(AssignInstruction instruction)

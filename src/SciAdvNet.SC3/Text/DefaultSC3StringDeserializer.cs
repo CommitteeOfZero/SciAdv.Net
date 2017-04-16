@@ -11,6 +11,9 @@ namespace SciAdvNet.SC3.Text
     /// </summary>
     public class DefaultSC3StringDeserializer : SC3StringDeserializer
     {
+        private static readonly DefaultSC3StringDeserializer s_instance = new DefaultSC3StringDeserializer();
+        public static DefaultSC3StringDeserializer Instance => s_instance;
+
         private sealed class Scanner
         {
             private const char EofCharacter = char.MaxValue;
@@ -25,14 +28,7 @@ namespace SciAdvNet.SC3.Text
 
             public bool ReachedEnd => Position >= Text.Length;
             public int Position { get; private set; }
-
-            public string TextWindow
-            {
-                get
-                {
-                    return Text.Substring(_textWindowStart, Position - _textWindowStart);
-                }
-            }
+            public string TextWindow => Text.Substring(_textWindowStart, Position - _textWindowStart);
 
             public void StartScanning() => _textWindowStart = Position;
             public char PeekChar()
@@ -71,7 +67,7 @@ namespace SciAdvNet.SC3.Text
                 }
             }
 
-            return new SC3String(segments.ToImmutable());
+            return new SC3String(segments.ToImmutable(), true);
         }
 
         private SC3StringSegment NextSegment(Scanner scanner)
@@ -80,7 +76,14 @@ namespace SciAdvNet.SC3.Text
             if (peek == '[')
             {
                 var tag = ParseTag(scanner);
-                return DeserializeTag(tag);
+                try
+                {
+                    return DeserializeTag(tag);
+                }
+                catch (InvalidDataException)
+                {
+                    return new TextSegment("[" + scanner.TextWindow);
+                }
             }
             else
             {
@@ -97,61 +100,67 @@ namespace SciAdvNet.SC3.Text
                 scanner.Advance();
             }
 
-            string value = StringUtils.ReplaceAsciiWithFullwidth(scanner.TextWindow);
+            string value = scanner.TextWindow;
             return new TextSegment(value);
         }
 
-        public virtual SC3StringSegment DeserializeTag(ParsedTag tag)
-        {
-            switch (tag.Name)
-            {
-                case "color":
-                    return DeserializeColorTag(tag);
-                case "margin":
-                    return DeserializeMarginTag(tag);
-                case "font":
-                    return DeserializeFontSizeTag(tag);
-                case "center":
-                    return new CenterTextCommand();
-                case "%p":
-                    return new PresentCommand(false);
-                case "%e":
-                    return new PresentCommand(true);
-
-                default:
-                    return DeserializeMarker(tag);
-
-            }
-        }
-
-        private Marker DeserializeMarker(ParsedTag tag)
+        public virtual SC3StringSegment DeserializeTag(MarkupTag tag)
         {
             switch (tag.Name.ToLowerInvariant())
             {
+                case "linebreak":
+                    return new LineBreakCommand();
                 case "name":
-                    return new Marker(MarkerKind.CharacterName);
+                    return new CharacterNameStartCommand();
                 case "line":
-                    return new Marker(MarkerKind.DialogueLine);
+                    return new DialogueLineStartCommand();
+                case "%p":
+                    return new PresentCommand(PresentCommand.Action.None);
+                case "color":
+                    return DeserializeColorTag(tag);
+                case "%e":
+                    return new PresentCommand(PresentCommand.Action.ResetTextAlignment);
                 case "rubybase":
-                    return new Marker(MarkerKind.RubyBase);
+                case "ruby-base":
+                    return new RubyBaseStartCommand();
                 case "rubytextstart":
-                    return new Marker(MarkerKind.RubyTextStart);
+                case "ruby-text-start":
+                    return new RubyTextStartCommand();
                 case "rubytextend":
-                    return new Marker(MarkerKind.RubyTextEnd);
+                case "ruby-text-end":
+                    return new RubyTextEndCommand();
+                case "font":
+                    return DeserializeFontSizeTag(tag);
+                case "parallel":
+                    return new PrintInParallelCommand();
+                case "center":
+                    return new CenterTextCommand();
+                case "margin":
+                    return DeserializeMarginTag(tag);
+                case "hardcodedvalue":
+                case "hardcoded-value":
+                    return DeserializeHardcodedValueTag(tag);
+                case "autoforward":
+                case "auto-forward":
+                    return new AutoForwardCommand();
+
+                case "%18":
+                    return new PresentCommand(PresentCommand.Action.Unknown_0x18);
 
                 default:
                     throw new InvalidDataException();
+
             }
         }
 
-        private SetColorCommand DeserializeColorTag(ParsedTag tag)
+        private SetColorCommand DeserializeColorTag(MarkupTag tag)
         {
             string index = tag.GetAttribute("index");
             var bytes = BinaryUtils.HexStrToBytes(index);
             return new SetColorCommand(SC3ExpressionParser.ParseExpression(bytes));
         }
 
-        private SetMarginCommand DeserializeMarginTag(ParsedTag tag)
+        private SetMarginCommand DeserializeMarginTag(MarkupTag tag)
         {
             if (!tag.Attributes.Any())
             {
@@ -172,20 +181,27 @@ namespace SciAdvNet.SC3.Text
             }
         }
 
-        private SetFontSizeCommand DeserializeFontSizeTag(ParsedTag tag)
+        private SetFontSizeCommand DeserializeFontSizeTag(MarkupTag tag)
         {
             string strSize = tag.GetAttribute("size");
             int size = int.Parse(strSize);
             return new SetFontSizeCommand(size);
         }
 
-        private ParsedTag ParseTag(Scanner scanner)
+        private GetHardcodedValueCommand DeserializeHardcodedValueTag(MarkupTag tag)
+        {
+            string strIndex = tag.GetAttribute("index");
+            int index = int.Parse(strIndex);
+            return new GetHardcodedValueCommand(index);
+        }
+
+        private MarkupTag ParseTag(Scanner scanner)
         {
             scanner.EatChar('[');
 
             char peek;
             scanner.StartScanning();
-            while (!scanner.ReachedEnd && (peek = scanner.PeekChar()) != ']' && peek != ' ')
+            while (!scanner.ReachedEnd && (peek = scanner.PeekChar()) != ']' && !char.IsWhiteSpace(peek))
             {
                 scanner.Advance();
             }
@@ -194,13 +210,13 @@ namespace SciAdvNet.SC3.Text
             if (scanner.PeekChar() == ']')
             {
                 scanner.Advance();
-                return new ParsedTag(tagName);
+                return new MarkupTag(tagName);
             }
 
             var attributes = ImmutableDictionary.CreateBuilder<string, string>();
             while (!scanner.ReachedEnd && (peek = scanner.PeekChar()) != ']')
             {
-                if (peek == ' ')
+                if (char.IsWhiteSpace(peek))
                 {
                     scanner.Advance();
                 }
@@ -212,7 +228,7 @@ namespace SciAdvNet.SC3.Text
             }
 
             scanner.EatChar(']');
-            return new ParsedTag(tagName, attributes.ToImmutable());
+            return new MarkupTag(tagName, attributes.ToImmutable());
         }
 
         private KeyValuePair<string, string> ParseAttribute(Scanner scanner)
@@ -239,15 +255,15 @@ namespace SciAdvNet.SC3.Text
             return new KeyValuePair<string, string>(attributeName.ToLowerInvariant(), value);
         }
 
-        public sealed class ParsedTag
+        public sealed class MarkupTag
         {
-            public ParsedTag(string name, ImmutableDictionary<string, string> attributes)
+            public MarkupTag(string name, ImmutableDictionary<string, string> attributes)
             {
                 Name = name;
                 Attributes = attributes;
             }
 
-            public ParsedTag(string name)
+            public MarkupTag(string name)
                 : this(name, ImmutableDictionary<string, string>.Empty)
             {
             }

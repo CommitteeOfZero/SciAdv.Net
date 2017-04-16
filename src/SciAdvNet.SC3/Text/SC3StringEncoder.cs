@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 
 namespace SciAdvNet.SC3.Text
 {
@@ -10,38 +9,27 @@ namespace SciAdvNet.SC3.Text
     /// </summary>
     public sealed class SC3StringEncoder : SC3StringSegmentVisitor
     {
-        private readonly GameSpecificData _data;
-
-        public SC3StringEncoder(SC3Game game)
+        public SC3StringEncoder(SC3Game game, string userCharacters = "")
         {
-            _data = GameSpecificData.For(game);
+            CharacterSet = new CharacterSet(game, userCharacters);
         }
+
+        public CharacterSet CharacterSet { get; }
 
         public ImmutableArray<byte> Encode(SC3String sc3String)
         {
-            var impl = new EncoderImpl(_data);
+            var impl = new EncoderImpl(CharacterSet);
             return impl.Encode(sc3String);
         }
 
         private sealed class EncoderImpl : SC3StringSegmentVisitor
         {
-            private static readonly Dictionary<MarkerKind, byte> s_markers = new Dictionary<MarkerKind, byte>()
-            {
-                [MarkerKind.CharacterName] = StringSegmentCodes.CharacterName,
-                [MarkerKind.DialogueLine] = StringSegmentCodes.DialogueLine,
-                [MarkerKind.RubyBase] = StringSegmentCodes.RubyBase,
-                [MarkerKind.RubyTextStart] = StringSegmentCodes.RubyTextStart,
-                [MarkerKind.RubyTextEnd] = StringSegmentCodes.RubyTextEnd
-            };
-
+            private readonly CharacterSet _characterSet;
             private ImmutableArray<byte>.Builder _builder;
-            private readonly GameSpecificData _data;
-            private string Charset => _data.CharacterSet;
-            private ImmutableDictionary<int, string> PrivateUseCharacters => _data.PrivateUseCharacters;
 
-            public EncoderImpl(GameSpecificData data)
+            public EncoderImpl(CharacterSet characterSet)
             {
-                _data = data;
+                _characterSet = characterSet;
             }
 
             public ImmutableArray<byte> Encode(SC3String sc3String)
@@ -52,7 +40,11 @@ namespace SciAdvNet.SC3.Text
                     Visit(segment);
                 }
 
-                Append(StringSegmentCodes.StringTerminator);
+                if (sc3String.IsProperlyTerminated)
+                {
+                    Write(EmbeddedCommands.StringTerminator);
+                }
+
                 return _builder.ToImmutable();
             }
 
@@ -60,64 +52,145 @@ namespace SciAdvNet.SC3.Text
             {
                 foreach (char c in text.Value)
                 {
-                    int index = Charset.IndexOf(c.ToString(), StringComparison.Ordinal);
-                    if (index == -1)
+                    ushort code;
+                    try
                     {
-                        Debugger.Break();
+                        code = _characterSet.EncodeCharacter(c);
+                        Write(code);
                     }
-
-                    byte first = (byte)(0x80 + (byte)(index / 256));
-                    byte second = (byte)(index % 256);
-
-                    Append(first);
-                    Append(second);
+                    catch (ArgumentException ex)
+                    {
+                        throw EncodingFailed(ex.Message);
+                    }
                 }
             }
 
-            public override void VisitMarker(Marker marker)
+            public override void VisitLineBreakCommand(LineBreakCommand lineBreakCommand)
             {
-                Append(s_markers[marker.MarkerKind]);
+                Write(EmbeddedCommands.LineBreak);
+            }
+
+            public override void VisitCharacterNameStartCommand(CharacterNameStartCommand characterNameStartCommand)
+            {
+                Write(EmbeddedCommands.CharacterNameStart);
+            }
+
+            public override void VisitDialogueLineStartCommand(DialogueLineStartCommand dialogueLineStartCommand)
+            {
+                Write(EmbeddedCommands.DialogueLineStart);
             }
 
             public override void VisitPresentCommand(PresentCommand presentCommand)
             {
-                byte b = presentCommand.ResetTextAlignment ? StringSegmentCodes.Present_ResetAlignment : StringSegmentCodes.Present;
-                Append(b);
+                byte code;
+                switch (presentCommand.AttachedAction)
+                {
+                    case PresentCommand.Action.ResetTextAlignment:
+                        code = EmbeddedCommands.Present_ResetAlignment;
+                        break;
+
+                    case PresentCommand.Action.Unknown_0x18:
+                        code = EmbeddedCommands.Present_0x18;
+                        break;
+
+                    case PresentCommand.Action.None:
+                    default:
+                        code = EmbeddedCommands.Present;
+                        break;
+                }
+
+                Write(code);
             }
 
             public override void VisitSetColorCommand(SetColorCommand setColorCommand)
             {
-                Append(StringSegmentCodes.SetColor);
-                Append(setColorCommand.ColorIndex.Bytes);
+                Write(EmbeddedCommands.SetColor);
+                Write(setColorCommand.ColorIndex.Bytes);
+            }
+
+            public override void VisitRubyBaseStartCommand(RubyBaseStartCommand rubyBaseStartCommand)
+            {
+                Write(EmbeddedCommands.RubyBaseStart);
+            }
+
+            public override void VisitRubyTextStartCommand(RubyTextStartCommand rubyTextStartCommand)
+            {
+                Write(EmbeddedCommands.RubyTextStart);
+            }
+
+            public override void VisitRubyTextEndCommand(RubyTextEndCommand rubyTextEndCommand)
+            {
+                Write(EmbeddedCommands.RubyTextEnd);
+            }
+
+            public override void VisitSetFontSizeCommand(SetFontSizeCommand setFontSizeCommand)
+            {
+                Write(EmbeddedCommands.SetFontSize);
+                WriteInt16BE((short)setFontSizeCommand.FontSize);
+            }
+
+            public override void VisitPrintInParallelCommand(PrintInParallelCommand printInParallelCommand)
+            {
+                Write(EmbeddedCommands.PrintInParallel);
             }
 
             public override void VisitCenterTextCommand(CenterTextCommand centerTextCommand)
             {
-                Append(StringSegmentCodes.SetAlignment_Center);
+                Write(EmbeddedCommands.CenterText);
             }
 
             public override void VisitSetMarginCommand(SetMarginCommand setMarginCommand)
             {
                 if (setMarginCommand.LeftMargin.HasValue)
                 {
-                    Append(StringSegmentCodes.SetLeftMargin);
-                    Append(BitConverter.GetBytes(setMarginCommand.LeftMargin.Value));
+                    Write(EmbeddedCommands.SetLeftMargin);
+                    WriteInt16BE((short)setMarginCommand.LeftMargin.Value);
                 }
                 else
                 {
-                    Append(StringSegmentCodes.SetTopMargin);
-                    Append(BitConverter.GetBytes(setMarginCommand.TopMargin.Value));
+                    Write(EmbeddedCommands.SetTopMargin);
+                    WriteInt16BE((short)setMarginCommand.TopMargin.Value);
                 }
             }
 
-            public override void VisitSetFontSizeCommand(SetFontSizeCommand setFontSizeCommand)
+            public override void VisitGetHardcodedValueCommand(GetHardcodedValueCommand getHardcodedValueCommand)
             {
-                Append(StringSegmentCodes.SetFontSize);
-                Append(BitConverter.GetBytes(setFontSizeCommand.FontSize));
+                Write(EmbeddedCommands.GetHardcodedValue);
+                WriteInt16BE((short)getHardcodedValueCommand.Index);
             }
 
-            private void Append(byte b) => _builder.Add(b);
-            private void Append(IEnumerable<byte> bytes) => _builder.AddRange(bytes);
+            public override void VisitEvaluateExpressionCommand(EvaluateExpressionCommand evaluateExpressionCommand)
+            {
+                base.VisitEvaluateExpressionCommand(evaluateExpressionCommand);
+            }
+
+            public override void VisitAutoForwardCommand(AutoForwardCommand autoForwardCommand)
+            {
+                Write(EmbeddedCommands.AutoForward);
+            }
+
+            private void Write(byte b) => _builder.Add(b);
+            private void WriteInt16BE(short value)
+            {
+                var bytes = BitConverter.GetBytes(value);
+                _builder.Add(bytes[1]);
+                _builder.Add(bytes[0]);
+            }
+
+            private void Write(ushort value)
+            {
+                var bytes = BitConverter.GetBytes(value);
+                _builder.Add(bytes[1]);
+                _builder.Add(bytes[0]);
+            }
+
+            private void Write(IEnumerable<byte> bytes) => _builder.AddRange(bytes);
+
+            private static Exception EncodingFailed(string reason)
+            {
+                string message = $"String encoding failed. {reason}";
+                return new StringEncodingFailedException(message);
+            }
         }
     }
 }

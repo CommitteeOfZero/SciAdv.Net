@@ -47,6 +47,21 @@ namespace SciAdvNet.NSScript.Tests
         }
 
         [Fact]
+        public void TestMethodCall()
+        {
+            string text = "WaitKey(10000);";
+            var call = NSScript.ParseStatement(text) as MethodCall;
+            Assert.NotNull(call);
+            Assert.Equal(SyntaxNodeKind.MethodCall, call.Kind);
+            Assert.Equal("WaitKey", call.TargetMethodName.FullName);
+            Assert.Equal(call.TargetMethodName.FullName, call.TargetMethodName.SimplifiedName);
+            Assert.Equal(SigilKind.None, call.TargetMethodName.Sigil);
+            Assert.Equal(1, call.Arguments.Length);
+
+            Assert.Equal(text, call.ToString());
+        }
+
+        [Fact]
         public void TestMethodWithIntParameter()
         {
             string text = "function Test(intParam){}";
@@ -127,6 +142,18 @@ namespace SciAdvNet.NSScript.Tests
             Assert.Null(ifStatement.IfFalseStatement);
 
             string toStringResult = Helpers.RemoveNewLineCharacters(ifStatement.ToString());
+            Assert.Equal(text, toStringResult);
+        }
+
+        [Fact]
+        public void TestBreakStatement()
+        {
+            string text = "break;";
+            var statement = NSScript.ParseStatement(text) as BreakStatement;
+            Assert.NotNull(statement);
+            Assert.Equal(SyntaxNodeKind.BreakStatement, statement.Kind);
+
+            string toStringResult = Helpers.RemoveNewLineCharacters(statement.ToString());
             Assert.Equal(text, toStringResult);
         }
 

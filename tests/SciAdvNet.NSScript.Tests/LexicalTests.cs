@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Xunit;
+﻿using Xunit;
 
 namespace SciAdvNet.NSScript.Tests
 {
@@ -120,40 +119,44 @@ namespace SciAdvNet.NSScript.Tests
             Assert.Equal(SyntaxTokenKind.EndOfFileToken, token.Kind);
         }
 
+        [Fact]
+        public void TestXmlStartTag()
+        {
+            string text = "<U>";
+            var token = LexToken(text);
+
+            Assert.Equal(SyntaxTokenKind.XmlElementStartTag, token.Kind);
+            Assert.Equal(text, token.Text);
+        }
+
+        [Fact]
+        public void TestXmlEndTag()
+        {
+            string text = "</U>";
+            var token = LexToken(text);
+
+            Assert.Equal(SyntaxTokenKind.XmlElementEndTag, token.Kind);
+            Assert.Equal(text, token.Text);
+        }
+
+        [Fact]
+        public void TestXmlTagWithNewline()
+        {
+            string text = "<FONT\n incolor=\"#88abda\" outcolor=\"BLACK\">";
+            var token = LexToken(text);
+
+            Assert.Equal(SyntaxTokenKind.XmlElementStartTag, token.Kind);
+        }
+
         //[Fact]
-        //public void TestXmlSyntaxMode()
+        //public void TestVerbatimStringLiteral()
         //{
-        //    // 0. XmlElementStartTag (PRE)
-        //    // 1. Xml_TextStartTag
-        //    // 2. Xml_Text
-        //    // 3. Xml_Text
-        //    // 4. Xml_LineBreak
-        //    // 5. XmlElementStartTag (voice)
-        //    // 6. Xml_Text
-        //    // 7. XmlElementStartTag (FONT)
-        //    // 8. Xml_Text
-        //    // 9. XmlElementEndTag (FONT)
-        //    // 10. Xml_Text
-        //    // 11. Xml_LineBreak
-        //    // 12. XmlElementEndTag (PRE)
+        //    string text = "<pre>sample text</pre>";
+        //    var token = LexToken(text);
 
-        //    string sourceText = TestScripts.Get("XmlSyntax.nss");
-        //    var tokens = NSScript.ParseTokens(sourceText).Where(x => x.IsXmlToken).ToList();
-        //    Assert.Equal(13, tokens.Count);
-
-        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[0].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_TextStartTag, tokens[1].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[2].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[3].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[4].Kind);
-        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[5].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[6].Kind);
-        //    Assert.Equal(SyntaxTokenKind.XmlElementStartTag, tokens[7].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[8].Kind);
-        //    Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[9].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_Text, tokens[10].Kind);
-        //    Assert.Equal(SyntaxTokenKind.Xml_LineBreak, tokens[11].Kind);
-        //    Assert.Equal(SyntaxTokenKind.XmlElementEndTag, tokens[12].Kind);
+        //    Assert.Equal(SyntaxTokenKind.Xml_VerbatimText, token.Kind);
+        //    Assert.Equal(text, token.Text);
+        //    Assert.Equal("sample text", token.Value);
         //}
 
         [Fact]
