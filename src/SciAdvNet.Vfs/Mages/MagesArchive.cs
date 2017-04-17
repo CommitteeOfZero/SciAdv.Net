@@ -10,12 +10,13 @@ namespace SciAdvNet.Vfs.Mages
     public sealed class MagesArchive : IArchive
     {
         public const string MpkSignature = "MPK\0";
+        private const int FirstEntryOffset = 0x40;
         private const int FileHeaderLength = 256;
 
         private readonly bool _leaveOpen;
         private bool _oldFormat;
         private short _versionMajor, _versionMinor;
-        private int _firstEntryOffset;
+        private int _v1LastReadId;
 
         private Func<BinaryReader, MpkFileEntry> _readEntryFunc;
         private Action<BinaryWriter, MpkFileEntry> _writeHeaderFunc;
@@ -31,7 +32,6 @@ namespace SciAdvNet.Vfs.Mages
 
         public ImmutableArray<IFileEntry> Entries { get; private set; }
         public ArchiveMode ArchiveMode { get; }
-        public bool IsCompressed { get; private set; }
 
         internal Stream ArchiveStream { get; }
 
@@ -108,36 +108,29 @@ namespace SciAdvNet.Vfs.Mages
                 _writeHeaderFunc = _oldFormat ? (Action<BinaryWriter, MpkFileEntry>)WriteHeaderV1 : WriteHeaderV2;
 
                 long entryCount = _oldFormat ? reader.ReadInt32() : reader.ReadInt64();
-                var bldEntries = ImmutableArray.CreateBuilder<IFileEntry>();
-
-                _firstEntryOffset = _oldFormat ? 0x40 : 0x44;
+                var entries = ImmutableArray.CreateBuilder<IFileEntry>();
                 for (int i = 0; i < entryCount; i++)
                 {
-                    ArchiveStream.Position = _firstEntryOffset + i * FileHeaderLength;
+                    ArchiveStream.Position = FirstEntryOffset + i * FileHeaderLength;
                     var entry = _readEntryFunc(reader);
-                    bldEntries.Add(entry);
+                    entries.Add(entry);
                 }
 
-                Entries = bldEntries.ToImmutable();
+                Entries = entries.ToImmutable();
             }
         }
 
         private MpkFileEntry ReadEntryV1(BinaryReader reader)
         {
             long fileHeaderOffset = reader.BaseStream.Position;
-            int id = reader.ReadInt32();
+            var compressionMethod = (CompressionMethod)reader.ReadInt32();
             int offset = reader.ReadInt32();
             long compressedLength = reader.ReadInt32();
             long uncompressedLength = reader.ReadInt32();
 
-            if (compressedLength != uncompressedLength)
-            {
-                IsCompressed = true;
-            }
-
             ArchiveStream.Position += 16;
             string name = reader.ReadNullTerminatedString();
-            var entry = new MpkFileEntry(this, id, name, offset, uncompressedLength, compressedLength);
+            var entry = new MpkFileEntry(this, _v1LastReadId++, name, offset, uncompressedLength, compressedLength, compressionMethod);
             entry.FileHeaderOffset = fileHeaderOffset;
             return entry;
         }
@@ -145,18 +138,14 @@ namespace SciAdvNet.Vfs.Mages
         private MpkFileEntry ReadEntryV2(BinaryReader reader)
         {
             long fileHeaderOffset = reader.BaseStream.Position;
+            var compressionMethod = (CompressionMethod)reader.ReadInt32();
             int id = reader.ReadInt32();
             long offset = reader.ReadInt64();
             long compressedLength = reader.ReadInt64();
             long uncompressedLength = reader.ReadInt64();
 
-            if (compressedLength != uncompressedLength)
-            {
-                IsCompressed = true;
-            }
-
             string name = reader.ReadNullTerminatedString();
-            var entry = new MpkFileEntry(this, id, name, offset, uncompressedLength, compressedLength);
+            var entry = new MpkFileEntry(this, id, name, offset, uncompressedLength, compressedLength, compressionMethod);
             entry.FileHeaderOffset = fileHeaderOffset;
             return entry;
         }
@@ -172,7 +161,7 @@ namespace SciAdvNet.Vfs.Mages
                 writer.Write(_versionMajor);
                 writer.Write(_oldFormat ? Entries.Length : (long)Entries.Length);
 
-                int padding = _firstEntryOffset - (int)tempFile.Position;
+                int padding = FirstEntryOffset - (int)tempFile.Position;
                 writer.Write(new byte[padding]);
 
                 int headerLength = (int)Entries[0].DataOffset - (int)tempFile.Position;

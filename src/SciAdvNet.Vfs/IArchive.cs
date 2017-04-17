@@ -7,7 +7,6 @@ namespace SciAdvNet.Vfs
     {
         ImmutableArray<IFileEntry> Entries { get; }
         ArchiveMode ArchiveMode { get; }
-        bool IsCompressed { get; }
 
         IFileEntry GetEntry(int id);
         IFileEntry GetEntry(string name);

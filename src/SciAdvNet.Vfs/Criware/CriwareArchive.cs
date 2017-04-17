@@ -38,7 +38,6 @@ namespace SciAdvNet.Vfs.Criware
         public CpkHeader Header { get; private set; }
         public ImmutableArray<IFileEntry> Entries { get; private set; }
         public ArchiveMode ArchiveMode { get; }
-        public bool IsCompressed => false;
 
         internal Stream ArchiveStream => _stream;
 

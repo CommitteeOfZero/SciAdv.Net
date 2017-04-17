@@ -52,6 +52,7 @@
     <Compile Include="IArchive.cs" />
     <Compile Include="ArchiveMode.cs" />
     <Compile Include="IFileEntry.cs" />
+    <Compile Include="Mages\CompressionMethod.cs" />
     <Compile Include="Mages\MagesArchive.cs" />
     <Compile Include="Mages\MpkFileEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

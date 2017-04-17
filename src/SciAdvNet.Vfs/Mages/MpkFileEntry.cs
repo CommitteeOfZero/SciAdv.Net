@@ -3,12 +3,12 @@ using System.IO.Compression;
 
 namespace SciAdvNet.Vfs.Mages
 {
-    public sealed class MpkFileEntry : IFileEntry
+    public sealed partial class MpkFileEntry : IFileEntry
     {
         private Stream _compressedData;
         private MemoryStream _uncompressedData;
 
-        internal MpkFileEntry(IArchive archive, int id, string name, long offset, long length, long compressedLength)
+        internal MpkFileEntry(IArchive archive, int id, string name, long offset, long length, long compressedLength, CompressionMethod compressionMethod)
         {
             Archive = archive;
             Id = id;
@@ -16,6 +16,7 @@ namespace SciAdvNet.Vfs.Mages
             DataOffset = offset;
             Length = length;
             CompressedLength = compressedLength;
+            CompressionMethod = compressionMethod;
         }
 
         public IArchive Archive { get; }
@@ -26,6 +27,7 @@ namespace SciAdvNet.Vfs.Mages
         public long DataOffset { get; internal set; }
         public long Length { get; internal set; }
         public long CompressedLength { get; internal set; }
+        public CompressionMethod CompressionMethod { get; internal set; }
 
         internal MemoryStream UncompressedData
         {
@@ -63,11 +65,11 @@ namespace SciAdvNet.Vfs.Mages
             {
                 if (_compressedData == null)
                 {
-                    if (!Archive.IsCompressed)
+                    if (CompressionMethod == CompressionMethod.Uncompressed)
                     {
                         _compressedData = new WrappedStream(UncompressedData);
                     }
-                    else
+                    else if (CompressionMethod == CompressionMethod.Zlib)
                     {
                         _compressedData = new DeflateStream(UncompressedData, CompressionMode.Compress);
                     }
@@ -101,7 +103,7 @@ namespace SciAdvNet.Vfs.Mages
         private Stream OpenRead()
         {
             var magesArchive = Archive as MagesArchive;
-            if (!magesArchive.IsCompressed)
+            if (CompressionMethod == CompressionMethod.Uncompressed)
             {
                 return new SubReadStream(magesArchive.ArchiveStream, DataOffset, Length);
             }
