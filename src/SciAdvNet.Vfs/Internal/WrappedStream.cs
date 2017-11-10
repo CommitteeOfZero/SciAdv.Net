@@ -20,8 +20,8 @@ namespace SciAdvNet.Vfs
 
         public override long Position
         {
-            get { return _baseStream.Position; }
-            set { _baseStream.Position = value; }
+            get => _baseStream.Position;
+            set => _baseStream.Position = value;
         }
 
         private void ThrowIfDisposed()

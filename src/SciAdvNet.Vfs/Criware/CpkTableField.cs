@@ -1,23 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 
 namespace SciAdvNet.Vfs.Criware
 {
     internal sealed class CpkTableField
     {
-        private static readonly Dictionary<int, int> NumericTypeSizes = new Dictionary<int, int>()
-        {
-            [0] = 1,
-            [1] = 1,
-            [2] = 2,
-            [3] = 2,
-            [4] = 4,
-            [5] = 4,
-            [6] = 8,
-            [7] = 8,
-            [8] = 4
-        };
-
         private const byte StorageMask = 0xf0;
         private const int TypeMask = 0x0f;
 
@@ -44,10 +30,11 @@ namespace SciAdvNet.Vfs.Criware
         private void DetermineType()
         {
             int cpkTypeCode = _flags & TypeMask;
-            if (NumericTypeSizes.ContainsKey(cpkTypeCode))
+            int numericTypeSize;
+            if ((numericTypeSize = GetNumericTypeSize(cpkTypeCode)) != -1)
             {
                 Type = CpkTableFieldType.UnsignedNumber;
-                Size = NumericTypeSizes[cpkTypeCode];
+                Size = numericTypeSize;
             }
             else
             {
@@ -62,8 +49,23 @@ namespace SciAdvNet.Vfs.Criware
                         break;
 
                     default:
-                        throw new NotSupportedException("Encountered an unknown data field type.");
+                        throw new InvalidDataException("Encountered a CPK table field of an unknown type.");
                 }
+            }
+        }
+
+        private static int GetNumericTypeSize(int typeCode)
+        {
+            switch (typeCode)
+            {
+                case 0: case 1: return 1;
+                case 2: case 3: return 2;
+                case 4: case 5: return 4;
+                case 6: case 7: return 8;
+                case 8: return 4;
+
+                default:
+                    return -1;
             }
         }
     }

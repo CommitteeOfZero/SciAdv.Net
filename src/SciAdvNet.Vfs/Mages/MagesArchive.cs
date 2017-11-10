@@ -1,5 +1,4 @@
-﻿using SciAdvNet.Common;
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -129,7 +128,7 @@ namespace SciAdvNet.Vfs.Mages
             long uncompressedLength = reader.ReadInt32();
 
             ArchiveStream.Position += 16;
-            string name = reader.ReadNullTerminatedString();
+            string name = reader.ReadNullTerminatedString(Encoding.UTF8);
             var entry = new MpkFileEntry(this, _v1LastReadId++, name, offset, uncompressedLength, compressedLength, compressionMethod);
             entry.FileHeaderOffset = fileHeaderOffset;
             return entry;
@@ -144,7 +143,7 @@ namespace SciAdvNet.Vfs.Mages
             long compressedLength = reader.ReadInt64();
             long uncompressedLength = reader.ReadInt64();
 
-            string name = reader.ReadNullTerminatedString();
+            string name = reader.ReadNullTerminatedString(Encoding.UTF8);
             var entry = new MpkFileEntry(this, id, name, offset, uncompressedLength, compressedLength, compressionMethod);
             entry.FileHeaderOffset = fileHeaderOffset;
             return entry;
@@ -215,6 +214,7 @@ namespace SciAdvNet.Vfs.Mages
 
         private void WriteHeaderV1(BinaryWriter writer, MpkFileEntry entry)
         {
+            writer.Write((int)entry.CompressionMethod);
             writer.Write(entry.Id);
             writer.Write((int)entry.DataOffset);
             writer.Write((int)entry.CompressedLength);
@@ -225,6 +225,7 @@ namespace SciAdvNet.Vfs.Mages
 
         private void WriteHeaderV2(BinaryWriter writer, MpkFileEntry entry)
         {
+            writer.Write((int)entry.CompressionMethod);
             writer.Write(entry.Id);
             writer.Write(entry.DataOffset);
             writer.Write(entry.CompressedLength);

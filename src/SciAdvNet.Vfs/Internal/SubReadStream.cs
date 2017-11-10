@@ -27,8 +27,8 @@ namespace SciAdvNet.Vfs
         public override long Length => _endInSuperStream - _startInSuperStream;
         public override long Position
         {
-            get { return _positionInSuperStream; }
-            set { throw new NotSupportedException(); }
+            get => _positionInSuperStream;
+            set => throw new NotSupportedException();
         }
 
         public override int Read(byte[] buffer, int offset, int count)

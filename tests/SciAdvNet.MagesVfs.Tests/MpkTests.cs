@@ -1,9 +1,10 @@
-﻿using SciAdvNet.Vfs.Mages;
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
+using SciAdvNet.Vfs;
+using SciAdvNet.Vfs.Mages;
 using Xunit;
 
-namespace SciAdvNet.Vfs.Tests
+namespace SciAdvNet.MagesVfs.Tests
 {
     public sealed class MpkTests
     {

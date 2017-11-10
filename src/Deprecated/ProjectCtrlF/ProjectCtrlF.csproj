@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    
+    <TargetFramework>net461</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  
+  <Import Project="..\..\..\OutputPath.props" />
+  
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Costura.Fody" Version="1.6.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\SciAdvNet.SC3Script\SciAdvNet.SC3Script.csproj" />
+    <ProjectReference Include="..\..\SciAdvNet.Vfs\SciAdvNet.Vfs.csproj" />
+  </ItemGroup>
+  
+</Project>

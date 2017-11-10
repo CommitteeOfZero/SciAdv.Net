@@ -1,5 +1,4 @@
-﻿using SciAdvNet.Common;
-using System.IO;
+﻿using System.IO;
 
 namespace SciAdvNet.Vfs.Criware
 {
@@ -18,7 +17,7 @@ namespace SciAdvNet.Vfs.Criware
                 StringsOffset = reader.ReadInt32BE() + 8;
                 DataOffset = reader.ReadInt32BE() + 8;
 
-                reader.SkipBytes(4); // table type?
+                reader.ReadBytes(4); // table type?
                 FieldCount = reader.ReadInt16BE();
                 EntrySize = reader.ReadInt16BE();
                 EntryCount = reader.ReadInt32BE();

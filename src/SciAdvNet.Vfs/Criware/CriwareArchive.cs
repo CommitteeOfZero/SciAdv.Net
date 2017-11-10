@@ -1,5 +1,4 @@
-﻿using SciAdvNet.Common;
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Text;
 
 namespace SciAdvNet.Vfs.Criware
 {
-    public sealed class CriwareArchive : IArchive, IDisposable
+    public sealed class CriwareArchive : IArchive
     {
         public const string CpkSignature = "CPK ";
 
@@ -114,7 +113,7 @@ namespace SciAdvNet.Vfs.Criware
 
         private void ReadHeader()
         {
-            _reader.SkipBytes(4);
+            _reader.ReadBytes(4);
             int cpkHeaderSize = (int)_reader.ReadInt64();
             var cpkHeaderBytes = _reader.ReadBytes(cpkHeaderSize);
             Header = CpkTable<CpkHeader>.Parse(cpkHeaderBytes).Entries.First();
@@ -122,7 +121,7 @@ namespace SciAdvNet.Vfs.Criware
 
         private void ReadToc()
         {
-            _reader.SkipBytes((int)Header.TocOffset + 4 + 4 + 8);
+            _reader.ReadBytes((int)Header.TocOffset + 4 + 4 + 8);
             var tocBytes = _reader.ReadBytes((int)Header.TocSize);
             _toc = CpkTable<CpkFileEntry>.Parse(tocBytes);
 

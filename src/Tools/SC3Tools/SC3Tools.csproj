@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblyName>sc3tools</AssemblyName>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  
+  <Import Project="..\..\..\OutputPath.props" />
+  
+  <ItemGroup>
+    <Content Include="config.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="config.json" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="0.1.0-e160620-1" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <PackageReference Include="Costura.Fody" Version="1.6.2" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\SciAdvNet.SC3Script\SciAdvNet.SC3Script.csproj" />
+  </ItemGroup>
+</Project>

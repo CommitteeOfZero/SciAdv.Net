@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Games>
+  <Game Name="SteinsGateZero" FriendlyName="Steins;Gate 0">
+    <Aliases>steinsgate0;sg0</Aliases>
+    <ReservedCharacterRange Start="E12F" End="E2AF" />
+  </Game>
+
+  <Game Name="ChaosChild" FriendlyName="Chaos;Child">
+    <Aliases>chaoschild;cc</Aliases>
+    <ReservedCharacterRange Start="E12F" End="E2AF" />
+  </Game>
+</Games>

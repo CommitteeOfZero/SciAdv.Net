@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SC3Tools": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    }
+  }
+}

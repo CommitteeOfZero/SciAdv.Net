@@ -21,8 +21,7 @@ namespace SciAdvNet.Vfs.Criware
 
             foreach (var field in entryFields)
             {
-                PropertyInfo prop;
-                if (map.TryGetValue(field.Key, out prop))
+                if (map.TryGetValue(field.Key, out PropertyInfo prop))
                 {
                     prop.SetValue(this, Convert.ChangeType(field.Value, prop.PropertyType));
                 }

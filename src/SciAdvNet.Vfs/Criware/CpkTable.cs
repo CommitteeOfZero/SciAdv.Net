@@ -1,5 +1,4 @@
-﻿using SciAdvNet.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -35,8 +34,8 @@ namespace SciAdvNet.Vfs.Criware
 
         private long Position
         {
-            get { return _reader.BaseStream.Position; }
-            set { _reader.BaseStream.Position = value; }
+            get => _reader.BaseStream.Position;
+            set => _reader.BaseStream.Position = value;
         }
 
         public static CpkTable<TEntry> Parse(byte[] bytes)
@@ -57,7 +56,7 @@ namespace SciAdvNet.Vfs.Criware
                 byte flags = _reader.ReadByte();
                 if (flags == 0)
                 {
-                    _reader.SkipBytes(3);
+                    _reader.ReadBytes(3);
                     continue;
                 }
 
@@ -112,7 +111,7 @@ namespace SciAdvNet.Vfs.Criware
         {
             long oldPosition = Position;
             Position = Header.StringsOffset + offset;
-            string str = _reader.ReadNullTerminatedString();
+            string str = _reader.ReadNullTerminatedString(Encoding.UTF8);
             Position = oldPosition;
 
             return str;
