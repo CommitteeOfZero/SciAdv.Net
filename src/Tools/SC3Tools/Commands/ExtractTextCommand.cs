@@ -27,7 +27,17 @@ namespace SC3Tools
 
         public override bool Execute()
         {
-            string outputDirName = IsWildcardPattern(_input) ? CreateOutputDirectory(_input, "txt") : "";
+            string outputDirName = null;
+            try
+            {
+                outputDirName = IsWildcardPattern(_input) ? CreateOutputDirectory(_input, "txt") : "";
+            }
+            catch (Exception e)
+            {
+                ReportError(e.Message);
+                return false;
+            }
+
             foreach (string inputPath in EnumerateFiles(_input))
             {
                 if (TryLoadScript(inputPath, _game, out var script))

@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{33D617FD-895
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{54E01EC0-228B-4CA4-A3C2-3CAFF1B5E9B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SciAdvNet.MagesVfs.Tests", "tests\SciAdvNet.MagesVfs.Tests\SciAdvNet.MagesVfs.Tests.csproj", "{8C821B74-3DCF-4FEB-BBC4-6FEF6A6CC4DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SciAdvNet.Vfs.Tests", "tests\SciAdvNet.Vfs.Tests\SciAdvNet.Vfs.Tests.csproj", "{8C821B74-3DCF-4FEB-BBC4-6FEF6A6CC4DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC3Tools", "src\Tools\SC3Tools\SC3Tools.csproj", "{C713EA6E-637F-4777-BE5E-00EFF00FA108}"
 EndProject

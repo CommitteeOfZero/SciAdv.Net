@@ -18,7 +18,6 @@ namespace ProjectCtrlF
         {
             if (int.TryParse(tag.Name, out int n))
             {
-                // TODO: WTF?
                 if (ScriptId.HasValue)
                 {
                     StringId = n;

@@ -1,34 +1,35 @@
 ﻿using SciAdvNet.SC3Script;
 using SciAdvNet.SC3Script.Text;
-using System.IO;
+using System.Collections.Generic;
 
 namespace SC3Tools
 {
     public static class SC3ScriptExtensions
     {
-        public static void ExtractStrings(this SC3Script script, string outputFilePath, string userCharacters, bool normalize)
+        public static IEnumerable<string> ExtractStrings(this SC3Script script, string userCharacters, bool normalize)
         {
+            var strings = new string[script.StringTable.Count];
             var decoder = new SC3StringDecoder(script.Game, userCharacters);
-            using (var writer = File.CreateText(outputFilePath))
+            foreach (var stringTableEntry in script.StringTable)
             {
-                foreach (var stringTableEntry in script.StringTable)
+                try
                 {
-                    try
+                    string line = decoder.DecodeString(stringTableEntry.RawData).ToString();
+                    if (normalize)
                     {
-                        string line = decoder.DecodeString(stringTableEntry.RawData).ToString();
-                        if (normalize)
-                        {
-                            line = TextUtils.NormalizeString(line);
-                        }
-                        writer.WriteLine(line);
+                        line = TextUtils.NormalizeString(line);
                     }
-                    catch (StringDecodingFailedException e)
-                    {
-                        string message = $"{e.Message}\nat line {stringTableEntry.Id} (offset: 0x{stringTableEntry.Offset + e.Position:X8})";
-                        throw new ExtractingStringsFailed(message);
-                    }
+
+                    strings[stringTableEntry.Id] = line;
+                }
+                catch (StringDecodingFailedException e)
+                {
+                    string message = $"{e.Message}\nat line {stringTableEntry.Id} (offset: 0x{stringTableEntry.Offset + e.Position:X8})";
+                    throw new ExtractingStringsFailed(message);
                 }
             }
+
+            return strings;
         }
 
         public static void UpdateStringTable(this SC3Script script, string[] lines, string userCharacters)

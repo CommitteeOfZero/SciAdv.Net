@@ -29,7 +29,7 @@ namespace SC3Tools
 
         private void GreetUser()
         {
-            Console.WriteLine("sc3tools 1.0 alpha\n");
+            Console.WriteLine("sc3tools 1.0 beta\n");
             Console.WriteLine("Available commands:");
             foreach (var command in Program.Shit)
             {

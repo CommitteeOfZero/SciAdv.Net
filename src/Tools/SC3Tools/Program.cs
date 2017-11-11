@@ -1,4 +1,5 @@
-﻿using SciAdvNet.SC3Script;
+﻿using Newtonsoft.Json;
+using SciAdvNet.SC3Script;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,6 +25,7 @@ namespace SC3Tools
         // Displayed to the user at startup.
         public static ImmutableDictionary<string, ImmutableArray<string>> GameAliases { get; private set; }
 
+        // TODO: come up with a better name.
         public static IReadOnlyList<ArgumentCommand> Shit { get; private set; }
 
         static int Main(string[] args)
@@ -138,15 +140,15 @@ namespace SC3Tools
                     return true;
                 }
             }
-            catch (FileNotFoundException)
-            {
-                return TryRestoreDefaultConfig();
-            }
-            catch
+            catch (JsonReaderException)
             {
                 ReportError($"The configuration file ('{ConfigFileName}') appears to be malformed. ");
                 LogInfo("Restoring the original configuration...");
                 BackupExistingConfig();
+                return TryRestoreDefaultConfig();
+            }
+            catch (Exception)
+            {
                 return TryRestoreDefaultConfig();
             }
 

@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using static SC3Tools.Program;
 
 namespace SC3Tools
@@ -36,10 +37,32 @@ namespace SC3Tools
             return path;
         }
 
+        public static bool TryCreateDirectory(string path)
+        {
+            try
+            {
+                Directory.CreateDirectory(path);
+                return true;
+            }
+            catch (Exception e)
+            {
+                ReportError(e.Message);
+                return false;
+            }
+        }
+
         public static bool IsWildcardPattern(string s) => s.Contains("*.");
         public static IEnumerable<string> EnumerateFiles(string pathOrPattern)
         {
-            return Directory.EnumerateFiles(GetInputDirectory(pathOrPattern), Path.GetFileName(pathOrPattern));
+            try
+            {
+                return Directory.EnumerateFiles(GetInputDirectory(pathOrPattern), Path.GetFileName(pathOrPattern));
+            }
+            catch (Exception e)
+            {
+                ReportError(e.Message);
+                return Enumerable.Empty<string>();
+            }
         }
 
         public static bool TryLoadScript(string path, SC3Game game, out SC3Script script)
@@ -49,15 +72,15 @@ namespace SC3Tools
                 script = SC3Script.Load(path, game);
                 return true;
             }
-            catch (FileNotFoundException e)
-            {
-                ReportError(e.Message);
-                script = null;
-                return false;
-            }
             catch (InvalidDataException)
             {
                 ReportError($"{path} is not a valid SC3 script.");
+                script = null;
+                return false;
+            }
+            catch (Exception e)
+            {
+                ReportError(e.Message);
                 script = null;
                 return false;
             }
@@ -67,15 +90,15 @@ namespace SC3Tools
         {
             try
             {
-                script.ExtractStrings(outputFilePath, userCharacters, normalize);
+                var strings = script.ExtractStrings(userCharacters, normalize);
+                File.WriteAllLines(outputFilePath, strings);
                 return true;
             }
-            catch (ExtractingStringsFailed e)
+            catch (Exception e)
             {
                 ReportError(e.Message);
                 return false;
             }
-
         }
 
         public static bool TryReplaceText(SC3Script script, string textFilePath, string userCharacters)
@@ -85,7 +108,7 @@ namespace SC3Tools
             {
                 lines = File.ReadAllLines(textFilePath);
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
                 ReportError(e.Message);
                 return false;
