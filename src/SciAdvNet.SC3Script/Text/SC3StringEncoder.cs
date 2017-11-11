@@ -51,46 +51,31 @@ namespace SciAdvNet.SC3Script.Text
             public override void VisitTextSegment(TextSegment text)
             {
                 string value = text.Value;
-                if (value.Length > 2 && value[0] == '[' && value[value.Length - 1] == ']')
+                for (int i = 0; i < value.Length; i++)
                 {
-                    if (!TryEncodeAsCompoundCharacter(value))
+                    char c = value[i];
+                    if (c == '[')
                     {
-                        EncodeAsRegularString(value);
-                    }
-                }
-                else
-                {
-                    EncodeAsRegularString(value);
-                }
-
-                void EncodeAsRegularString(string s)
-                {
-                    foreach (char c in s)
-                    {
-                        try
+                        int idxClosingBracket = value.IndexOf(']', i);
+                        if (idxClosingBracket != -1)
                         {
-                            ushort code = _characterSet.EncodeCharacter(c);
+                            string compoundChar = value.Substring(i + 1, idxClosingBracket - i - 1);
+                            ushort code = _characterSet.EncodeCompoundCharacter(compoundChar);
                             Write(code);
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            throw EncodingFailed(ex.Message);
+
+                            i += (idxClosingBracket - i);
+                            continue;
                         }
                     }
-                }
 
-                bool TryEncodeAsCompoundCharacter(string s)
-                {
-                    string compoundCharacter = s.Substring(1, s.Length - 2);
                     try
                     {
-                        ushort code = _characterSet.EncodeCompoundCharacter(compoundCharacter);
+                        ushort code = _characterSet.EncodeCharacter(c);
                         Write(code);
-                        return true;
                     }
-                    catch (ArgumentException)
+                    catch (ArgumentException ex)
                     {
-                        return false;
+                        throw EncodingFailed(ex.Message);
                     }
                 }
             }
