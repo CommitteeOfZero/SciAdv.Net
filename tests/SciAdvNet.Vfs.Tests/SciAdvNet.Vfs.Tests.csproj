@@ -5,11 +5,6 @@
   
   <Import Project="..\..\OutputPath.props" />
   
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Data/**" CopyToOutputDirectory="PreserveNewest" />
@@ -20,7 +15,11 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 </Project>

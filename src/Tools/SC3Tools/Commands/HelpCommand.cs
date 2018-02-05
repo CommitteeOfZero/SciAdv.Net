@@ -31,7 +31,7 @@ namespace SC3Tools
         {
             Console.WriteLine("sc3tools 1.0 beta\n");
             Console.WriteLine("Available commands:");
-            foreach (var command in Program.Shit)
+            foreach (var command in Program.CommandList)
             {
                 Console.WriteLine($"{command.Name,-20} {command.Help,-70}");
             }

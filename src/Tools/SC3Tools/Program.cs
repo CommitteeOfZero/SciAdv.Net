@@ -14,7 +14,8 @@ namespace SC3Tools
     {
         public const string ConfigFileName = "config.json";
 
-        public static ImmutableDictionary<string, Command> AvaliableCommands { get; private set; }
+        public static ImmutableDictionary<string, Command> CommandMap { get; private set; }
+        public static IReadOnlyList<ArgumentCommand> CommandList { get; private set; }
         public static Configuration Config { get; private set; }
         public static (string path, string args) DefaultTextEditor { get; private set; }
 
@@ -24,9 +25,6 @@ namespace SC3Tools
         // <FriendlyName, alias[]>
         // Displayed to the user at startup.
         public static ImmutableDictionary<string, ImmutableArray<string>> GameAliases { get; private set; }
-
-        // TODO: come up with a better name.
-        public static IReadOnlyList<ArgumentCommand> Shit { get; private set; }
 
         static int Main(string[] args)
         {
@@ -40,7 +38,7 @@ namespace SC3Tools
             var s = ArgumentSyntax.Parse(args, syntax =>
             {
                 HelpCommand helpCommand = null;
-                foreach (var command in AvaliableCommands.OrderBy(x => x.Key).Select(x => x.Value))
+                foreach (var command in CommandMap.OrderBy(x => x.Key).Select(x => x.Value))
                 {
                     if (command is HelpCommand help)
                     {
@@ -62,9 +60,9 @@ namespace SC3Tools
                 }
             });
 
-            Shit = s.Commands;
+            CommandList = s.Commands;
 
-            var activeCommand = AvaliableCommands[s.ActiveCommand.Name];
+            var activeCommand = CommandMap[s.ActiveCommand.Name];
             if (!(activeCommand is HelpCommand) && !displayHelp)
             {
                 bool valid = ValidateArguments(s);
@@ -88,7 +86,7 @@ namespace SC3Tools
 
         public static bool Execute(string commandName)
         {
-            if (!AvaliableCommands.TryGetValue(commandName, out var command))
+            if (!CommandMap.TryGetValue(commandName, out var command))
             {
                 return false;
             }
@@ -122,7 +120,7 @@ namespace SC3Tools
             ConstructSupportedGamesDictionary();
 
             var thisAssembly = typeof(Program).Assembly;
-            AvaliableCommands = thisAssembly.DefinedTypes
+            CommandMap = thisAssembly.DefinedTypes
                 .Where(x => x.IsSubclassOf(typeof(Command)))
                 .Select(x => (Command)Activator.CreateInstance(x))
                 .ToImmutableDictionary(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
