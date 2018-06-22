@@ -165,10 +165,11 @@ namespace SciAdvNet.SC3Script
 
         public override void VisitDataBlockAccessExpression(DataBlockAccessExpression expression)
         {
+            Write("DataAccess(");
             Visit(expression.BlockReference);
-            Write("[");
+            Write(", ");
             Visit(expression.ElementIndex);
-            Write("]");
+            Write(")");
         }
 
         public override void VisitRandomNumberExpression(RandomNumberExpression expression)

@@ -55,10 +55,16 @@ namespace SciAdvNet.SC3Script.Text
             throw UnsupportedCharacter(character.ToString());
         }
 
+        public bool TryEncodeCompoundCharacter(string compoundCharacter, out ushort code)
+        {
+            return _encodingMaps.Compound.TryGetValue(compoundCharacter, out code);
+        }
+
         public ushort EncodeCompoundCharacter(string compoundCharacter)
         {
-            return _encodingMaps.Compound.TryGetValue(compoundCharacter, out ushort code) ?
-                code : throw UnsupportedCharacter(compoundCharacter);
+            return TryEncodeCompoundCharacter(compoundCharacter, out ushort code)
+                ? code
+                : throw UnsupportedCharacter(compoundCharacter);
         }
 
         /// <summary>

@@ -22,6 +22,21 @@ namespace SciAdvNet.SC3Script.Tests
         }
 
         [Fact]
+        public void DecodeTextInBrackets()
+        {
+            // [Fictional]
+            string hex = "805d8010802d80278038802d8033803280258030805fff";
+            var sc3String = SC3String.FromBytes(Utils.HexStringToBytes(hex), SC3Game.SteinsGateZero);
+            Assert.Single(sc3String.Segments);
+
+            var textSegment = sc3String.Segments[0] as TextSegment;
+            Assert.NotNull(textSegment);
+            Assert.Equal("[Fictional]", textSegment.Value);
+
+            Compare(hex, sc3String.Encode(SC3Game.SteinsGateZero));
+        }
+
+        [Fact]
         public void DecodeCompountCharacter()
         {
             string hex = "9EC1"; // [...]

@@ -164,12 +164,12 @@ namespace SC3Tools
                     }
                     catch (IOException)
                     {
-                        ReportError("Could not access the configuration file. It is likely used to another process.");
+                        ReportError("Could not access the configuration file. It is likely used by another process.");
                         return false;
                     }
                     catch (UnauthorizedAccessException)
                     {
-                        ReportError("Access to the configuration file was denied by the system. ");
+                        ReportError("Access to the configuration file was denied by the system.");
                         return false;
                     }
                 }

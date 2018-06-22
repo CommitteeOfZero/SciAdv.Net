@@ -85,7 +85,7 @@ namespace SciAdvNet.SC3Script
 
         private static ImmutableDictionary<ImmutableArray<byte>, InstructionStub> ReadCommonInstructionStubs()
         {
-            using (var stream = GetResourceStream(InstructionStubsFileName))
+            using (var stream = GetResourceStream(CommonInstructionStubsFileName))
             {
                 return InstructionStubsParser.Parse(stream);
             }

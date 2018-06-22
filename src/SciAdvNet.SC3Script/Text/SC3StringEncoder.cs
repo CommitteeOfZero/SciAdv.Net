@@ -59,12 +59,13 @@ namespace SciAdvNet.SC3Script.Text
                         int idxClosingBracket = value.IndexOf(']', i);
                         if (idxClosingBracket != -1)
                         {
-                            string compoundChar = value.Substring(i + 1, idxClosingBracket - i - 1);
-                            ushort code = _characterSet.EncodeCompoundCharacter(compoundChar);
-                            Write(code);
-
-                            i += (idxClosingBracket - i);
-                            continue;
+                            string textInBrackets = value.Substring(i + 1, idxClosingBracket - i - 1);
+                            if (_characterSet.TryEncodeCompoundCharacter(textInBrackets, out ushort code))
+                            {
+                                Write(code);
+                                i += (idxClosingBracket - i);
+                                continue;
+                            }
                         }
                     }
 
