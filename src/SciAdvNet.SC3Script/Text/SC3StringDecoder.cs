@@ -98,7 +98,7 @@ namespace SciAdvNet.SC3Script.Text
 
                 case EmbeddedCommandCodes.SetColor:
                     scanner.Advance();
-                    var colorIndex = SC3ExpressionParser.ParseExpression(scanner.Reader);
+                    var colorIndex = scanner.Reader.ReadByte();
                     return new SetColorCommand(colorIndex);
 
                 case EmbeddedCommandCodes.Present_ResetAlignment:

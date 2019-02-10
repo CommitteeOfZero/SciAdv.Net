@@ -121,7 +121,7 @@ namespace SciAdvNet.SC3Script.Text
             public override void VisitSetColorCommand(SetColorCommand setColorCommand)
             {
                 Write(EmbeddedCommandCodes.SetColor);
-                Write(setColorCommand.ColorIndex.Bytes);
+                Write(setColorCommand.ColorIndex);
             }
 
             public override void VisitRubyBaseStartCommand(RubyBaseStartCommand rubyBaseStartCommand)

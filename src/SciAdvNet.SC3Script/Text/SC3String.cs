@@ -316,12 +316,12 @@ namespace SciAdvNet.SC3Script.Text
 
     public sealed class SetColorCommand : EmbeddedCommand, IEquatable<SetColorCommand>
     {
-        public SetColorCommand(Expression colorIndex)
+        public SetColorCommand(byte colorIndex)
         {
             ColorIndex = colorIndex;
         }
 
-        public Expression ColorIndex { get; }
+        public byte ColorIndex { get; }
         public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.SetColor;
 
         internal override void Accept(SC3StringSegmentVisitor visitor)
@@ -335,7 +335,7 @@ namespace SciAdvNet.SC3Script.Text
         }
 
         public override bool Equals(object obj) => Equals(obj as SetColorCommand);
-        public override int GetHashCode() => 1516799092 + EqualityComparer<Expression>.Default.GetHashCode(ColorIndex);
+        public override int GetHashCode() => 1516799092 + ColorIndex;
     }
 
     public sealed class RubyBaseStartCommand : EmbeddedCommand, IEquatable<RubyBaseStartCommand>

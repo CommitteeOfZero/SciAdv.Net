@@ -98,7 +98,7 @@ namespace SciAdvNet.SC3Script.Text
 
             public override void VisitSetColorCommand(SetColorCommand setColorCommand)
             {
-                string index = BinaryUtils.BytesToHexString(setColorCommand.ColorIndex.Bytes);
+                string index = BinaryUtils.BytesToHexString(new[] { setColorCommand.ColorIndex });
                 Write($"[color index=\"{index}\"]");
             }
 

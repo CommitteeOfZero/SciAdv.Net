@@ -201,7 +201,7 @@ namespace SciAdvNet.SC3Script.Text
         {
             string index = tag.GetAttribute("index");
             var bytes = BinaryUtils.HexStringToBytes(index);
-            return new SetColorCommand(SC3ExpressionParser.ParseExpression(bytes));
+            return new SetColorCommand(bytes[0]);
         }
 
         private SetMarginCommand DeserializeMarginTag(MarkupTag tag)
