@@ -175,6 +175,12 @@ namespace SciAdvNet.SC3Script.Tests
             Assert.Equal(0x1A, command.Code);
         }
 
+        [Fact]
+        public void DecodeRubyCenterPerCharCommand()
+        {
+            var command = TestCommand("1E", EmbeddedCommandKind.RubyCenterPerChar) as RubyCenterPerCharCommand;
+        }
+
         private EmbeddedCommand TestCommand(string hex, EmbeddedCommandKind expectedCommandKind)
         {
             var sc3String = SC3String.FromBytes(Utils.HexStringToBytes(hex), SC3Game.SteinsGateZero);

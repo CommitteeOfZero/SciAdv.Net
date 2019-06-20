@@ -178,14 +178,13 @@ namespace SciAdvNet.SC3Script.Text
                 case "autoforward":
                 case "auto-forward":
                     return new AutoForwardCommand(EmbeddedCommandCodes.AutoForward);
-
                 case "autoforward-1a":
                 case "auto-forward-1a":
                     return new AutoForwardCommand(EmbeddedCommandCodes.AutoForward_1A);
-
                 case "%18":
                     return new PresentCommand(PresentCommand.SideEffectKind.Unknown_0x18);
-
+                case "ruby-center-per-char":
+                    return new RubyCenterPerCharCommand();
                 case "evaluate":
                     var exprBytes = BinaryUtils.HexStringToBytes(tag.Attributes["expr"]);
                     var expr = SC3ExpressionParser.ParseExpression(exprBytes);

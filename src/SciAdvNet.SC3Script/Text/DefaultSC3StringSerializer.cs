@@ -168,6 +168,11 @@ namespace SciAdvNet.SC3Script.Text
                     Write("[auto-forward-1a]");
                 }
             }
+
+            public override void VisitRubyCenterPerCharCommand(RubyCenterPerCharCommand rubyCenterPerCharCommand)
+            {
+                Write("[ruby-center-per-char]");
+            }
         }
     }
 }

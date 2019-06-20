@@ -21,7 +21,7 @@
         public const byte Present_0x18 = 0x18;
         public const byte AutoForward = 0x19;
         public const byte AutoForward_1A = 0x1A;
-
+        public const byte RubyCenterPerChar = 0x1E;
         public const byte AltLineBreak = 0x1F;
 
         public const byte StringTerminator = 0xFF;

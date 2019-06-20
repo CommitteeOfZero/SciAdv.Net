@@ -186,6 +186,11 @@ namespace SciAdvNet.SC3Script.Text
                 Write(autoForwardCommand.Code);
             }
 
+            public override void VisitRubyCenterPerCharCommand(RubyCenterPerCharCommand rubyCenterPerCharCommand)
+            {
+                Write(EmbeddedCommandCodes.RubyCenterPerChar);
+            }
+
             private void Write(byte b) => _builder.Add(b);
             private void WriteInt16BE(short value)
             {

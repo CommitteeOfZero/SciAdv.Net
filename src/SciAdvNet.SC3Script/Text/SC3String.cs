@@ -235,7 +235,8 @@ namespace SciAdvNet.SC3Script.Text
         GetHardcodedValue,
         EvaluateExpression,
         AutoForward,
-        Unknown
+        Unknown,
+        RubyCenterPerChar
     }
 
     public sealed class LineBreakCommand : EmbeddedCommand, IEquatable<LineBreakCommand>
@@ -524,5 +525,19 @@ namespace SciAdvNet.SC3Script.Text
         public bool Equals(AutoForwardCommand other) => ReferenceEquals(this, other) || Code == other?.Code;
         public override bool Equals(object obj) => Equals(obj as AutoForwardCommand);
         public override int GetHashCode() => -434485196 + Code.GetHashCode();
+    }
+
+    public sealed class RubyCenterPerCharCommand : EmbeddedCommand, IEquatable<RubyCenterPerCharCommand>
+    {
+        public override EmbeddedCommandKind CommandKind => EmbeddedCommandKind.RubyCenterPerChar;
+
+        internal override void Accept(SC3StringSegmentVisitor visitor)
+        {
+            visitor.VisitRubyCenterPerCharCommand(this);
+        }
+
+        public bool Equals(RubyCenterPerCharCommand other) => other != null;
+        public override bool Equals(object obj) => obj != null;
+        public override int GetHashCode() => -1237277532 + CommandKind.GetHashCode();
     }
 }

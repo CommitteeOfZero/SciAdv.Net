@@ -146,6 +146,12 @@ namespace SciAdvNet.SC3Script.Tests
             Assert.Equal(Utils.HexStringToBytes("290AA4B5141400810000"), command.Expression.Bytes);
         }
 
+        [Fact]
+        public void DeserializeRubyCenterPerCharTag()
+        {
+            TestTag("[ruby-center-per-char]", EmbeddedCommandKind.RubyCenterPerChar);
+        }
+
         private EmbeddedCommand TestTag(string text, EmbeddedCommandKind expectedCommandKind)
         {
             var sc3String = SC3String.Deserialize(text);

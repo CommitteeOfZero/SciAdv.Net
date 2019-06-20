@@ -159,6 +159,10 @@ namespace SciAdvNet.SC3Script.Text
                     scanner.Advance();
                     return new PresentCommand(PresentCommand.SideEffectKind.Unknown_0x18);
 
+                case EmbeddedCommandCodes.RubyCenterPerChar:
+                    scanner.Advance();
+                    return new RubyCenterPerCharCommand();
+
                 default:
                     peek = scanner.PeekByte();
                     if (IsCharacter(peek))

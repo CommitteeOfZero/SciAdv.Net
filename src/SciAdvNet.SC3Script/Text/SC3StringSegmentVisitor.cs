@@ -22,5 +22,6 @@ namespace SciAdvNet.SC3Script.Text
         public virtual void VisitGetHardcodedValueCommand(GetHardcodedValueCommand getHardcodedValueCommand) { }
         public virtual void VisitEvaluateExpressionCommand(EvaluateExpressionCommand evaluateExpressionCommand) { }
         public virtual void VisitAutoForwardCommand(AutoForwardCommand autoForwardCommand) { }
+        public virtual void VisitRubyCenterPerCharCommand(RubyCenterPerCharCommand rubyCenterPerCharCommand) { }
     }
 }
