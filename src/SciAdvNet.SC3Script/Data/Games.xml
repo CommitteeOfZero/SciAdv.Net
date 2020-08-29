@@ -9,4 +9,14 @@
     <Aliases>chaoschild;cc</Aliases>
     <ReservedCharacterRange Start="E12F" End="E2AF" />
   </Game>
+  
+  <Game Name="SteinsGateHD" FriendlyName="Steins;Gate HD">
+    <Aliases>steinsgatehd;sghd</Aliases>
+    <ReservedCharacterRange Start="E12F" End="E2AF" />
+  </Game>
+    
+  <Game Name="SteinsGatePhenogram" FriendlyName="Steins;Gate Phenogram">
+    <Aliases>steinsgatephenogram;sgpheno</Aliases>
+    <ReservedCharacterRange Start="E12F" End="E2AF" />
+  </Game>
 </Games>
